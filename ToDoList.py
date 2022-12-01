@@ -144,6 +144,143 @@ def add_task():
 
     add_tk.mainloop()
 
+def add_task2():
+    # 업무 레벨에 따라 No링 잘 하기
+    # no 정렬 방식 활용 해보기
+    add_tk = Tk()
+    add_tk.title("업무 추가")
+
+    def add_db():
+        wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+        db_ws = wb['DB']
+        # values_only=True를 해야 위치값이 아닌 실제 데이터 값이 도출됨
+        db_header = db_ws.iter_rows(min_row=1, max_row=1, max_col=9, values_only=True)
+        db_datas = db_ws.iter_rows(min_row=2, max_col=9, values_only=True)
+        db_header = [r for r in db_header]
+        db_datas = [r for r in db_datas]
+        
+        # print(db_datas[db_ws.max_row-2][0])
+        lv1_cnt = int(db_datas[db_ws.max_row-2][0][0:2])
+        lv1_next = lv1_cnt+1
+        lv1_next = format(lv1_next,'02')
+        # print(format(lv1_next,'02'))
+        # print(db_ws.max_row)
+        r_add = db_ws.max_row + 1
+        db_ws.cell(row=r_add, column=1).value = lv1_next + "-00-00"
+        db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
+        db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
+        db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
+        db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
+        db_ws.cell(row=r_add, column=6).value = entry_date.get()
+        db_ws.cell(row=r_add, column=7).value = entry_time.get()
+        db_ws.cell(row=r_add, column=8).value = entry_note.get()
+        db_ws.cell(row=r_add, column=9).value = 1
+
+        wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+
+
+    # 업무명/내용
+    frame_task_name = Frame(add_tk)
+    frame_task_name.pack(fill="x")
+
+    lbl_upper_task_name = Label(frame_task_name, text="업무명/내용 - 레벨1")
+    lbl_upper_task_name.pack(side="top")
+
+    lbl_task_name = Label(frame_task_name, text="업무명/내용 - 레벨2")
+    lbl_task_name.pack(side="left")
+
+    entry_task_name = Entry(frame_task_name)
+    entry_task_name.pack(side="right")
+
+    # 담당팀
+    frame_team_name = Frame(add_tk)
+    frame_team_name.pack(fill="x")
+
+    lbl_team_name = Label(frame_team_name, text="담당팀")
+    lbl_team_name.pack(side="left")
+
+    entry_team_name = Entry(frame_team_name)
+    entry_team_name.pack(side="right")
+
+    # 담당자
+    frame_person_name = Frame(add_tk)
+    frame_person_name.pack(fill="x")
+
+    lbl_person_name = Label(frame_person_name, text="담당자")
+    lbl_person_name.pack(side="left")
+
+    entry_person_name = Entry(frame_person_name)
+    entry_person_name.pack(side="right")
+
+    # 상황
+    frame_situation = Frame(add_tk)
+    frame_situation.pack(fill="x")
+
+    lbl_situation = Label(frame_situation, text="상황")
+    lbl_situation.pack(side="left")
+
+    opt_situation = ["진행","완료","검토","취소","중단","지연"]
+    cmb_situation = ttk.Combobox(frame_situation,state="readonly",
+    values=opt_situation)
+    cmb_situation.current(0)
+    cmb_situation.pack(side="right")
+
+    # 완료날짜
+    frame_date = Frame(add_tk)
+    frame_date.pack(fill="x")
+
+    lbl_date = Label(frame_date, text="완료날짜")
+    lbl_date.pack(side="left")
+
+    entry_date = Entry(frame_date)
+    entry_date.pack(side="right")
+    entry_date.insert(END, "2022-12-01")
+
+    # 완료시간
+    frame_time = Frame(add_tk)
+    frame_time.pack(fill="x")
+
+    lbl_time = Label(frame_time, text="완료시간")
+    lbl_time.pack(side="left")
+
+    entry_time = Entry(frame_time)
+    entry_time.pack(side="right")
+    entry_time.insert(END, "13:00")
+
+    
+    # 비고
+    frame_note = Frame(add_tk)
+    frame_note.pack(fill="x")
+
+    lbl_note = Label(frame_note, text="비고")
+    lbl_note.pack(side="left")
+
+    entry_note = Entry(frame_note)
+    entry_note.pack(side="right")
+
+    # fucntion2 frame
+    frame_func2 = Frame(add_tk)
+    frame_func2.pack(fill="x")
+
+    # add db
+    btn_add_db = Button(frame_func2, text="추가",command=add_db)
+    btn_add_db.pack(side="left")
+
+    # cancel button
+    # quit 함수를 쓰면 전체 프로그램이 종료되어서 withdraw 함수 사용함
+    btn_cancel = Button(frame_func2, text="취소", command=add_tk.withdraw)
+    btn_cancel.pack(side="right")
+
+    add_tk.mainloop()
+
+def selectItem(a):
+    # curItem = tree.index()
+    curItem = tree.focus()
+    item_index = tree.index(curItem)
+    print(item_index)
+
+
+    # print(tree.item(curItem))
 
 # 첫 실행 시 Database load
 
@@ -212,9 +349,16 @@ func_frame.pack(fill="x")
 btn_add_task = Button(func_frame, text="업무추가", command=add_task)
 btn_add_task.pack(side="left")
 
+# 하위 업무 추가
+btn_add_task2 = Button(func_frame, text="하위 업무추가", command=add_task2)
+btn_add_task2.pack(side="left")
+
 # 종료 버튼
 btn_close = Button(func_frame, text="종료", command=win.quit)
 btn_close.pack(side="right")
+
+tree.bind('<ButtonRelease-1>', selectItem)
+
 
 win.mainloop()
 
