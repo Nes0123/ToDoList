@@ -71,34 +71,52 @@ win.title("To Do List")
 
 # treeview 활용
 # y,x 스크롤바 추가 필요
-# tree = ttk.Treeview(win, selectmode='browse')
+# 클릭시 여러개 선택 가능하도록 (extended)
 tree = ttk.Treeview(win, selectmode='extended')
-# tree.pack()
+# tree = ttk.Treeview(win, selectmode='browse')
+
 tree.pack(expand=True, fill="both")
 
-# tree.grid(row=0,column=0,columnspan=3,padx=30,pady=20)
+# # Number of rows to display, default is 10
+tree['height'] = 30
 
-tree['columns'] = ("1", "2", "3", "4", "5", "6","7")
+tree['columns'] = ("1", "2", "3", "4", "5", "6")
 
-tree.heading("#0", text="No")
-tree.heading("#1", text="상황")
-tree.heading("#2", text="업무명")
-tree.heading("#3", text="완료날짜")
-tree.heading("#4", text="완료시간")
-tree.heading("#5", text="담당팀")
-tree.heading("#6", text="담당자")
-tree.heading("#7", text="비고")
+# column보다 heading이 1개 더 많아서(#0) 하이라키구조 처럼 +- 표시가 됨. 
+tree.heading("#0", text="업무명/내용")
+tree.heading("#1", text="담당팀")
+tree.heading("#2", text="담당자")
+tree.heading("#3", text="상황")
+tree.heading("#4", text="완료날짜")
+tree.heading("#5", text="완료시간")
+tree.heading("#6", text="비고")
 
-tree.column("1", width=60)
-tree.column("2", width=60)
-tree.column("3", width=60)
-tree.column("4", width=60)
-tree.column("5", width=60)
-tree.column("6", width=60)
-tree.column("7", width=60)
+tree.column("1", width=100)
+tree.column("2", width=100)
+tree.column("3", width=50, anchor='c')
+tree.column("4", width=70, anchor='c')
+tree.column("5", width=70, anchor='c')
+tree.column("6", width=100)
 
-lv1 = tree.insert("",0, "task1", text="No")
-tree.insert(lv1,"end", text='01-01-00', values=('진행','전 실에 요청 우편','22-11-20','10:30','기획팀','박기아','ASAP'))
+
+for data in db_datas:
+    # print(data[0][6:8])
+    # text 값이 있어야 하이라키구조 처럼 보여질 수 있음 (+-표시).
+    # lv1에만 open=true를 줘서 실행 시 lv2까지만 자동 보여주기    
+    if data[0][3:8] == '00-00':
+        lv1 = tree.insert('','end', iid=data[0], text=data[1], values=data[2:8], open=True)
+    elif '00' in data[0][6:8]:
+        lv2 = tree.insert(lv1,'end',iid=data[0], text=data[1] ,values=data[2:8])
+    else :
+        lv3 = tree.insert(lv2,'end',iid=data[0], text=data[1] ,values=data[2:8])
+
+
+# lv1 = tree.insert("",0, "task1", text="인력소요", values=('인사팀','박기아','진행','22-11-20','10:30','ASAP'))
+# tree.insert(lv1,"end", text='전 실에 요청 우편', values=('기획팀','박기아','완료','22-11-12','10:30','ASAP'))
+
+# lv1 = tree.insert("",0, "task1", text="인력소요", values=('인사팀','박기아','진행','22-11-20','10:30','ASAP'))
+# tree.insert(lv1,"end", text='전 실에 요청 우편', values=('기획팀','박기아','완료','22-11-12','10:30','ASAP'))
+
 
 # # Number of rows to display, default is 10
 # tree['height'] = 20
