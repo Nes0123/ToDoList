@@ -3,9 +3,152 @@ from openpyxl import load_workbook
 from tkinter import ttk
 from tkinter import *
 
-# 엑셀 데이터 추출
+# Database load
+def load_db():
+
+    # 엑셀 데이터 추출
+    wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+    db_ws = wb['DB']
+    # values_only=True를 해야 위치값이 아닌 실제 데이터 값이 도출됨
+    db_header = db_ws.iter_rows(min_row=1, max_row=1, max_col=9, values_only=True)
+    db_datas = db_ws.iter_rows(min_row=2, max_col=9, values_only=True)
+
+    db_header = [r for r in db_header]
+    db_datas = [r for r in db_datas]
+    wb.close()
+    return(wb, db_ws, db_header, db_datas) # ??되나?
+ 
+def add_task():
+    # 업무 레벨에 따라 No링 잘 하기
+    # no 정렬 방식 활용 해보기
+    add_tk = Tk()
+    add_tk.title("업무 추가")
+
+    def add_db():
+        wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+        db_ws = wb['DB']
+        # values_only=True를 해야 위치값이 아닌 실제 데이터 값이 도출됨
+        db_header = db_ws.iter_rows(min_row=1, max_row=1, max_col=9, values_only=True)
+        db_datas = db_ws.iter_rows(min_row=2, max_col=9, values_only=True)
+        db_header = [r for r in db_header]
+        db_datas = [r for r in db_datas]
+        
+        # print(db_datas[db_ws.max_row-2][0])
+        lv1_cnt = int(db_datas[db_ws.max_row-2][0][0:2])
+        lv1_next = lv1_cnt+1
+        lv1_next = format(lv1_next,'02')
+        # print(format(lv1_next,'02'))
+        # print(db_ws.max_row)
+        r_add = db_ws.max_row + 1
+        db_ws.cell(row=r_add, column=1).value = lv1_next + "-00-00"
+        db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
+        db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
+        db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
+        db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
+        db_ws.cell(row=r_add, column=6).value = entry_date.get()
+        db_ws.cell(row=r_add, column=7).value = entry_time.get()
+        db_ws.cell(row=r_add, column=8).value = entry_note.get()
+        db_ws.cell(row=r_add, column=9).value = 1
+
+        wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+
+
+    # 업무명/내용
+    frame_task_name = Frame(add_tk)
+    frame_task_name.pack(fill="x")
+
+    lbl_task_name = Label(frame_task_name, text="업무명/내용 - 레벨1")
+    lbl_task_name.pack(side="left")
+
+    entry_task_name = Entry(frame_task_name)
+    entry_task_name.pack(side="right")
+
+    # 담당팀
+    frame_team_name = Frame(add_tk)
+    frame_team_name.pack(fill="x")
+
+    lbl_team_name = Label(frame_team_name, text="담당팀")
+    lbl_team_name.pack(side="left")
+
+    entry_team_name = Entry(frame_team_name)
+    entry_team_name.pack(side="right")
+
+    # 담당자
+    frame_person_name = Frame(add_tk)
+    frame_person_name.pack(fill="x")
+
+    lbl_person_name = Label(frame_person_name, text="담당자")
+    lbl_person_name.pack(side="left")
+
+    entry_person_name = Entry(frame_person_name)
+    entry_person_name.pack(side="right")
+
+    # 상황
+    frame_situation = Frame(add_tk)
+    frame_situation.pack(fill="x")
+
+    lbl_situation = Label(frame_situation, text="상황")
+    lbl_situation.pack(side="left")
+
+    opt_situation = ["진행","완료","검토","취소","중단","지연"]
+    cmb_situation = ttk.Combobox(frame_situation,state="readonly",
+    values=opt_situation)
+    cmb_situation.current(0)
+    cmb_situation.pack(side="right")
+
+    # 완료날짜
+    frame_date = Frame(add_tk)
+    frame_date.pack(fill="x")
+
+    lbl_date = Label(frame_date, text="완료날짜")
+    lbl_date.pack(side="left")
+
+    entry_date = Entry(frame_date)
+    entry_date.pack(side="right")
+    entry_date.insert(END, "2022-12-01")
+
+    # 완료시간
+    frame_time = Frame(add_tk)
+    frame_time.pack(fill="x")
+
+    lbl_time = Label(frame_time, text="완료시간")
+    lbl_time.pack(side="left")
+
+    entry_time = Entry(frame_time)
+    entry_time.pack(side="right")
+    entry_time.insert(END, "13:00")
+
+    
+    # 비고
+    frame_note = Frame(add_tk)
+    frame_note.pack(fill="x")
+
+    lbl_note = Label(frame_note, text="비고")
+    lbl_note.pack(side="left")
+
+    entry_note = Entry(frame_note)
+    entry_note.pack(side="right")
+
+    # fucntion2 frame
+    frame_func2 = Frame(add_tk)
+    frame_func2.pack(fill="x")
+
+    # add db
+    btn_add_db = Button(frame_func2, text="추가",command=add_db)
+    btn_add_db.pack(side="left")
+
+    # cancel button
+    # quit 함수를 쓰면 전체 프로그램이 종료되어서 withdraw 함수 사용함
+    btn_cancel = Button(frame_func2, text="취소", command=add_tk.withdraw)
+    btn_cancel.pack(side="right")
+
+    add_tk.mainloop()
+
+
+# 첫 실행 시 Database load
+
 wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
-db_ws = wb['Sheet2']
+db_ws = wb['DB']
 # values_only=True를 해야 위치값이 아닌 실제 데이터 값이 도출됨
 db_header = db_ws.iter_rows(min_row=1, max_row=1, max_col=9, values_only=True)
 db_datas = db_ws.iter_rows(min_row=2, max_col=9, values_only=True)
@@ -13,59 +156,9 @@ db_datas = db_ws.iter_rows(min_row=2, max_col=9, values_only=True)
 db_header = [r for r in db_header]
 db_datas = [r for r in db_datas]
 wb.close()
-# print(db_header[0])
-db_datas
 
-def load_db():
+# 프로그램 메인 화면 tkinter 
 
-    # tkinter 활용
-    root = Tk()
-    root.title("To Do List")
-
-    # treeview 활용
-    # y,x 스크롤바 추가 필요
-    tree = ttk.Treeview(root, selectmode='extended')
-    tree.pack(expand=True, fill="both")
-    # tree.grid(row=0,column=0,columnspan=3,padx=30,pady=20)
-
-    # Number of rows to display, default is 10
-    tree['height'] = 20
-    # 컬럼 제목만 보이게함?
-    tree['show'] = 'headings'
-
-    tree['columns'] = db_header[0]
-
-    for i in db_header[0]:
-        tree.column(i, width=100, anchor='c')
-        tree.heading(i, text=i, anchor='c')
-
-
-    for data in db_datas:
-        tree.insert("",'end', iid=data[0], values=data)
-
-
-    root.mainloop()
-
-def add_task():
-    # 업무 레벨에 따라 No링 잘 하기
-    # no 정렬 방식 활용 해보기
-    pass
-
-
-# wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
-out_ws = wb['Sheet1']
-# values_only=True를 해야 위치값이 아닌 실제 데이터 값이 도출됨
-out_header = out_ws.iter_rows(min_row=1, max_row=1, max_col=8, values_only=True)
-# out_datas = out_ws.iter_rows(min_row=2, max_col=8, values_only=True)
-
-out_header = [r for r in out_header]
-# out_datas = [r for r in out_datas]
-wb.close()
-# print(out_header[0])
-# out_datas
-
-
-# tkinter 활용
 win = Tk()
 win.title("To Do List")
 
@@ -78,7 +171,7 @@ tree = ttk.Treeview(win, selectmode='extended')
 tree.pack(expand=True, fill="both")
 
 # # Number of rows to display, default is 10
-tree['height'] = 30
+tree['height'] = 20
 
 tree['columns'] = ("1", "2", "3", "4", "5", "6")
 
@@ -111,88 +204,17 @@ for data in db_datas:
         lv3 = tree.insert(lv2,'end',iid=data[0], text=data[1] ,values=data[2:8])
 
 
-# lv1 = tree.insert("",0, "task1", text="인력소요", values=('인사팀','박기아','진행','22-11-20','10:30','ASAP'))
-# tree.insert(lv1,"end", text='전 실에 요청 우편', values=('기획팀','박기아','완료','22-11-12','10:30','ASAP'))
+# function frame
+func_frame = Frame(win)
+func_frame.pack(fill="x")
 
-# lv1 = tree.insert("",0, "task1", text="인력소요", values=('인사팀','박기아','진행','22-11-20','10:30','ASAP'))
-# tree.insert(lv1,"end", text='전 실에 요청 우편', values=('기획팀','박기아','완료','22-11-12','10:30','ASAP'))
+# 업무 추가 버튼
+btn_add_task = Button(func_frame, text="업무추가", command=add_task)
+btn_add_task.pack(side="left")
 
-
-# # Number of rows to display, default is 10
-# tree['height'] = 20
-# # 컬럼 제목만 보이게함?
-# tree['show'] = 'headings'
-
-# tree['columns'] = out_header[0]
-
-# for i in out_header[0]:
-#     tree.column(i, width=100, anchor='c')
-
-# # tree.column('#0', width=100, anchor='c')
-# tree.heading('#0', text="task", anchor='c')
-
-
-# for i in out_header[0]:
-#     # tree.column(i, width=100, anchor='c')
-#     tree.heading(i, text=i, anchor='c')
-
-
-# # task1 = tree.insert("",'end', iid=db_datas[0], values=db_datas[0])
-# # task2 = tree.insert(task1,'end', iid=db_datas[1], values=db_datas[1])
-
-
-# # tree.insert('','end', iid=1, text="dkdkdk")
-
-
-# ## text와 values의 차이?
-
-# for data in db_datas:
-#     # print(type(data[0][6:8]))
-#     # if '00' in data[0][6:8] :
-#     #     print(data)
-#     # else: print("no")
-
-#     if data[0][3:8] == '00-00':
-#         tree.insert('','end', 'task1', text=data[2], values=data)
-
-#         # task1 = tree.insert("",'end', iid=data[0], text=data, tags="tag1")
-
-
-#     # elif data[0][3:8] != '00-00' & '00' in data[0][6:8]:
-#     elif '00' in data[0][6:8]:
-#         tree.insert('task1','end', text=data[2] ,values=data)
-#     else :
-#         pass
-#         # tree.insert(task2,'end', values=data, tags="tag3")
-
-
-# # for data in db_datas:
-# #     # print(type(data[0][6:8]))
-
-# #     # if '00' in data[0][6:8] :
-# #     #     print(data)
-# #     # else: print("no")
-
-# #     if data[0][3:8] == '00-00':
-# #         # print(data)
-# #         # task1 = tree.insert("",'end', iid=data[0], tags="tag1", text=data)
-# #         # task1 = tree.insert('','end', iid=data[0], text="111")
-# #         # task1 = tree.insert('','end', iid=data[0], values=data, tags="tag1", open=True)
-
-# #         task1 = tree.insert("",'end', iid=data[0], text=data, tags="tag1")
-
-
-# #     # elif data[0][3:8] != '00-00' & '00' in data[0][6:8]:
-# #     elif '00' in data[0][6:8]:
-# #         task2 = tree.insert(task1,'end',values=data)
-# #     else :
-# #         tree.insert(task2,'end', values=data, tags="tag3")
-
-# # tree.move(task2, task1, END)
-
-
-#         # print(data)
-# tree.tag_bind("tag1",sequence="<<TreeviewOpen>>")
+# 종료 버튼
+btn_close = Button(func_frame, text="종료", command=win.quit)
+btn_close.pack(side="right")
 
 win.mainloop()
 
