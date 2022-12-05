@@ -178,14 +178,25 @@ def add_task2():
 
         wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
 
+    print(selectItem)
 
+    # 상위 업무명/내용
+    frame_upper_task_name = Frame(add_tk)
+    frame_upper_task_name.pack(fill="x")
+
+    lbl_upper_task = Label(frame_upper_task_name, text="업무명/내용 - 레벨1")
+    lbl_upper_task.pack(side="left")
+    
+    # lbl_upper_task_name = Label(frame_upper_task_name, text=" ")
+    # lbl_upper_task_name = Entry(frame_upper_task_name, text=selectItem)
+    lbl_upper_task_name = Label(frame_upper_task_name, text=selectItem())
+    # lbl_upper_task_name.config(text=selectItem)
+    lbl_upper_task_name.pack(side="right")
+    
     # 업무명/내용
     frame_task_name = Frame(add_tk)
     frame_task_name.pack(fill="x")
-
-    lbl_upper_task_name = Label(frame_task_name, text="업무명/내용 - 레벨1")
-    lbl_upper_task_name.pack(side="top")
-
+    
     lbl_task_name = Label(frame_task_name, text="업무명/내용 - 레벨2")
     lbl_task_name.pack(side="left")
 
@@ -274,13 +285,34 @@ def add_task2():
     add_tk.mainloop()
 
 def selectItem(a):
-    # curItem = tree.index()
-    curItem = tree.focus()
-    item_index = tree.index(curItem)
-    print(item_index)
+    for item in tree.selection():
+        item_child = tree.get_children(item)
+        item = tree.item(item)
+        iid = tree.focus()
+        # iid2 = tree.identify("item", event.x, event.y)
+        print("iid : ", iid)
+        # print("iid2 : ", iid2)
+        print("item : ", item)
+        print("item_child : ", item_child)
+        # print("text : ", tree.item(iid2)["text"])
+        print("text2 : ", tree.item(iid)["text"])
+        # label.config()
+    return(tree.item(iid)["text"])
 
-
-    # print(tree.item(curItem))
+# def selectItem(event):
+#     for item in tree.selection():
+#         item_child = tree.get_children(item)
+#         item = tree.item(item)
+#         iid = tree.focus()
+#         iid2 = tree.identify("item", event.x, event.y)
+#         print("iid : ", iid)
+#         print("iid2 : ", iid2)
+#         print("item : ", item)
+#         print("item_child : ", item_child)
+#         print("text : ", tree.item(iid2)["text"])
+#         print("text2 : ", tree.item(iid)["text"])
+#         # label.config()
+#     return(tree.item(iid)["text"])
 
 # 첫 실행 시 Database load
 
@@ -359,6 +391,11 @@ btn_close.pack(side="right")
 
 tree.bind('<ButtonRelease-1>', selectItem)
 
+# for item in tree.selection():
+#     item_child = tree.get_children(item)
+#     item = tree.item(item)
+#     iid = tree.focus()
+#     print(iid)
 
 win.mainloop()
 
