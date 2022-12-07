@@ -4,6 +4,7 @@ from tkinter import ttk
 from tkinter import *
 import tkinter as tk 
 import win32com.client
+import pandas as pd
 
 # class load_db:
     # def __init__(self,wb):
@@ -209,17 +210,9 @@ def add_task2():
         lv1_cnt = format(lv1_cnt,'02')
         lv2_next = lv2_cnt+1
         lv2_next = format(lv2_cnt+1,'02')
-        print(lv1_cnt + "-" + lv2_next + "-00")
+        # print(lv1_cnt + "-" + lv2_next + "-00")
         # db_datas는 0부터 시작하고, 제목행이 빠져서 -2를 해야함
         if db_datas[r_selected-2][0][3:8] == "00-00":
-            print("yes")
-
-        # # print(db_datas[db_ws.max_row-2][0])
-        # lv1_cnt = int(db_datas[db_ws.max_row-2][0][0:2])
-        # lv1_next = lv1_cnt+1
-        # lv1_next = format(lv1_next,'02')
-        # # print(format(lv1_next,'02'))
-        # # print(db_ws.max_row)
             r_add = db_ws.max_row + 1
             db_ws.cell(row=r_add, column=1).value = lv1_cnt + "-" + lv2_next + "-00"
             db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
@@ -380,6 +373,29 @@ def load_task():
     # wb.Save()
     # excel.Application.Quit()
 
+def sort():
+    db_df = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx", sheet_name='DB')
+    # print(db_df)
+    db_df = db_df.sort_values(by=['No'])
+    # print(db_df)
+    db_df.to_excel("C:/Python/Code/ToDoList/test.xlsx",index=False, sheet_name="DB")
+    path1 = "C:/Python/Code/ToDoList/ToDoList_Form.xlsx"
+    path2 = "C:/Python/Code/ToDoList/test.xlsx"
+    
+    wb2 = load_workbook(filename=path2)
+    ws2 = wb2['DB']
+
+    wb1 = load_workbook(filename=path1)
+    wb1.remove(wb1['DB'])
+    ws1 = wb1.create_sheet()
+    ws1.title = 'DB'
+    # ws1 = wb1['DB']
+    for row in ws2:
+        for cell in row:
+            ws1[cell.coordinate].value = cell.value
+    wb1.save(path1)
+
+
 
 win = Tk()
 win.title("To Do List")
@@ -426,7 +442,7 @@ btn_add_task2.pack(side="left")
 btn_close = Button(func_frame, text="종료", command=win.quit)
 btn_close.pack(side="right")
 
-
+sort()
 load_task()
 
 # column_names = ("team_name", "person_name", "situation",
