@@ -5,7 +5,13 @@ from tkinter import *
 import tkinter as tk 
 import win32com.client
 import pandas as pd
+import tkinter.messagebox as msgbox
+import os
 
+
+# 필요 : class 사용하기, 업무 추가 후 안내 메시지 보내고 새로고침
+# 담당팀, 담당자 주소록 만들기, 편집, 삭제 기능
+# 스크롤바 추가
 # class load_db:
     # def __init__(self,wb):
     #     self.wb = wb
@@ -28,134 +34,169 @@ import pandas as pd
 #         db_datas = [r for r in db_datas]
 #         wb.close()
 #         return db_datas
+# def refresh():
+#     win.destroy()
+#     os.popen("C:/Python/Code/ToDoList/ToDoList_v1.py")
 
 def add_task():
-    # 업무 레벨에 따라 No링 잘 하기
-    # no 정렬 방식 활용 해보기
-    add_tk = Tk()
-    add_tk.title("업무 추가")
+    try:
+        # 업무 레벨에 따라 No링 잘 하기
+        # no 정렬 방식 활용 해보기
+        add_tk = Tk()
+        add_tk.title("업무 추가")
 
-    def add_db():
-        wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
-        db_ws = wb['DB']
-        # values_only=True를 해야 위치값이 아닌 실제 데이터 값이 도출됨
-        db_header = db_ws.iter_rows(min_row=1, max_row=1, max_col=9, values_only=True)
-        db_datas = db_ws.iter_rows(min_row=2, max_col=9, values_only=True)
-        db_header = [r for r in db_header]
-        db_datas = [r for r in db_datas]
+        def add_db():
+            wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+            db_ws = wb['DB']
+            # values_only=True를 해야 위치값이 아닌 실제 데이터 값이 도출됨
+            db_header = db_ws.iter_rows(min_row=1, max_row=1, max_col=9, values_only=True)
+            db_datas = db_ws.iter_rows(min_row=2, max_col=9, values_only=True)
+            db_header = [r for r in db_header]
+            db_datas = [r for r in db_datas]
+            
+            # print(db_datas[db_ws.max_row-2][0])
+            lv1_cnt = int(db_datas[db_ws.max_row-2][0][0:2])
+            # print(lv1_cnt)
+            lv1_next = lv1_cnt+1
+            lv1_next = format(lv1_next,'02')
+            # print(format(lv1_next,'02'))
+            # print(db_ws.max_row)
+            r_add = db_ws.max_row + 1
+            db_ws.cell(row=r_add, column=1).value = lv1_next + "-00-00"
+            # 값이 없을 때 공백 하나 넣기. 값이 없으면 편집 함수 중 entry 값을 불러올 때 에러가 남
+            if len(entry_task_name.get()) == 0 :
+                db_ws.cell(row=r_add, column=2).value = " "    
+            else : 
+                db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
+            if len(entry_team_name.get()) == 0 :
+                db_ws.cell(row=r_add, column=3).value = " "
+            else :    
+                db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
+            if len(entry_person_name.get()) == 0:
+                db_ws.cell(row=r_add, column=4).value = " "
+            else :    
+                db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
+            db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
+            if len(entry_date.get()) == 0:
+                db_ws.cell(row=r_add, column=6).value = " "    
+            else :
+                db_ws.cell(row=r_add, column=6).value = entry_date.get()
+            if len(entry_time.get()) == 0:
+                db_ws.cell(row=r_add, column=7).value = " "
+            else :    
+                db_ws.cell(row=r_add, column=7).value = entry_time.get()
+            if len(entry_note.get()) == 0:
+                db_ws.cell(row=r_add, column=8).value = " "
+            else :     
+                db_ws.cell(row=r_add, column=8).value = entry_note.get()
+            db_ws.cell(row=r_add, column=9).value = 1
+
+            wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+
+            msgbox.showinfo("알림", "신규 업무 추가가 완료되었습니다.")
+
+            add_tk.withdraw()
+            sort()
+            load_task()
+
+
+        # 업무명/내용
+        frame_task_name = Frame(add_tk)
+        frame_task_name.pack(fill="x")
+
+        lbl_task_name = Label(frame_task_name, text="업무명/내용 - 레벨1")
+        lbl_task_name.pack(side="left")
+
+        entry_task_name = Entry(frame_task_name)
+        entry_task_name.pack(side="right")
+
+        # 담당팀
+        frame_team_name = Frame(add_tk)
+        frame_team_name.pack(fill="x")
+
+        lbl_team_name = Label(frame_team_name, text="담당팀")
+        lbl_team_name.pack(side="left")
+
+        entry_team_name = Entry(frame_team_name)
+        entry_team_name.pack(side="right")
+
+        # 담당자
+        frame_person_name = Frame(add_tk)
+        frame_person_name.pack(fill="x")
+
+        lbl_person_name = Label(frame_person_name, text="담당자")
+        lbl_person_name.pack(side="left")
+
+        entry_person_name = Entry(frame_person_name)
+        entry_person_name.pack(side="right")
+
+        # 상황
+        frame_situation = Frame(add_tk)
+        frame_situation.pack(fill="x")
+
+        lbl_situation = Label(frame_situation, text="상황")
+        lbl_situation.pack(side="left")
+
+        opt_situation = ["진행","완료","검토","취소","중단","지연"]
+        cmb_situation = ttk.Combobox(frame_situation,state="readonly",
+        values=opt_situation)
+        cmb_situation.current(0)
+        cmb_situation.pack(side="right")
+
+        # 완료날짜
+        frame_date = Frame(add_tk)
+        frame_date.pack(fill="x")
+
+        lbl_date = Label(frame_date, text="완료날짜")
+        lbl_date.pack(side="left")
+
+        entry_date = Entry(frame_date)
+        entry_date.pack(side="right")
+        # entry_date.insert(END, "YY-MM-DD")
+
+        # 완료시간
+        frame_time = Frame(add_tk)
+        frame_time.pack(fill="x")
+
+        lbl_time = Label(frame_time, text="완료시간")
+        lbl_time.pack(side="left")
+
+        entry_time = Entry(frame_time)
+        entry_time.pack(side="right")
+        # entry_time.insert(END, "HH:MM")
+
         
-        # print(db_datas[db_ws.max_row-2][0])
-        lv1_cnt = int(db_datas[db_ws.max_row-2][0][0:2])
-        lv1_next = lv1_cnt+1
-        lv1_next = format(lv1_next,'02')
-        # print(format(lv1_next,'02'))
-        # print(db_ws.max_row)
-        r_add = db_ws.max_row + 1
-        db_ws.cell(row=r_add, column=1).value = lv1_next + "-00-00"
-        db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
-        db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
-        db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
-        db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
-        db_ws.cell(row=r_add, column=6).value = entry_date.get()
-        db_ws.cell(row=r_add, column=7).value = entry_time.get()
-        db_ws.cell(row=r_add, column=8).value = entry_note.get()
-        db_ws.cell(row=r_add, column=9).value = 1
+        # 비고
+        frame_note = Frame(add_tk)
+        frame_note.pack(fill="x")
 
-        wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+        lbl_note = Label(frame_note, text="비고")
+        lbl_note.pack(side="left")
+
+        entry_note = Entry(frame_note)
+        entry_note.pack(side="right")
+
+        # fucntion2 frame
+        frame_func2 = Frame(add_tk)
+        frame_func2.pack(fill="x")
+
+        # add db
+        btn_add_db = Button(frame_func2, text="추가",command=add_db)
+        btn_add_db.pack(side="left")
+
+        # cancel button
+        # quit 함수를 쓰면 전체 프로그램이 종료되어서 withdraw 함수 사용함
+        btn_cancel = Button(frame_func2, text="취소", command=add_tk.withdraw)
+        btn_cancel.pack(side="right")
 
 
-    # 업무명/내용
-    frame_task_name = Frame(add_tk)
-    frame_task_name.pack(fill="x")
-
-    lbl_task_name = Label(frame_task_name, text="업무명/내용 - 레벨1")
-    lbl_task_name.pack(side="left")
-
-    entry_task_name = Entry(frame_task_name)
-    entry_task_name.pack(side="right")
-
-    # 담당팀
-    frame_team_name = Frame(add_tk)
-    frame_team_name.pack(fill="x")
-
-    lbl_team_name = Label(frame_team_name, text="담당팀")
-    lbl_team_name.pack(side="left")
-
-    entry_team_name = Entry(frame_team_name)
-    entry_team_name.pack(side="right")
-
-    # 담당자
-    frame_person_name = Frame(add_tk)
-    frame_person_name.pack(fill="x")
-
-    lbl_person_name = Label(frame_person_name, text="담당자")
-    lbl_person_name.pack(side="left")
-
-    entry_person_name = Entry(frame_person_name)
-    entry_person_name.pack(side="right")
-
-    # 상황
-    frame_situation = Frame(add_tk)
-    frame_situation.pack(fill="x")
-
-    lbl_situation = Label(frame_situation, text="상황")
-    lbl_situation.pack(side="left")
-
-    opt_situation = ["진행","완료","검토","취소","중단","지연"]
-    cmb_situation = ttk.Combobox(frame_situation,state="readonly",
-    values=opt_situation)
-    cmb_situation.current(0)
-    cmb_situation.pack(side="right")
-
-    # 완료날짜
-    frame_date = Frame(add_tk)
-    frame_date.pack(fill="x")
-
-    lbl_date = Label(frame_date, text="완료날짜")
-    lbl_date.pack(side="left")
-
-    entry_date = Entry(frame_date)
-    entry_date.pack(side="right")
-    entry_date.insert(END, "YY-MM-DD")
-
-    # 완료시간
-    frame_time = Frame(add_tk)
-    frame_time.pack(fill="x")
-
-    lbl_time = Label(frame_time, text="완료시간")
-    lbl_time.pack(side="left")
-
-    entry_time = Entry(frame_time)
-    entry_time.pack(side="right")
-    entry_time.insert(END, "HH:MM")
-
+        add_tk.mainloop()
     
-    # 비고
-    frame_note = Frame(add_tk)
-    frame_note.pack(fill="x")
 
-    lbl_note = Label(frame_note, text="비고")
-    lbl_note.pack(side="left")
+    except Exception as err:
+        msgbox.showerror("에러", err)
 
-    entry_note = Entry(frame_note)
-    entry_note.pack(side="right")
-
-    # fucntion2 frame
-    frame_func2 = Frame(add_tk)
-    frame_func2.pack(fill="x")
-
-    # add db
-    btn_add_db = Button(frame_func2, text="추가",command=add_db)
-    btn_add_db.pack(side="left")
-
-    # cancel button
-    # quit 함수를 쓰면 전체 프로그램이 종료되어서 withdraw 함수 사용함
-    btn_cancel = Button(frame_func2, text="취소", command=add_tk.withdraw)
-    btn_cancel.pack(side="right")
-
-    add_tk.mainloop()
-
-def selectItem():
+def get_text():
     
     selected_item = tree.item(tree.selection())
     # selected_iid = tree.focus()
@@ -177,13 +218,216 @@ def get_iid():
 
 
 def add_task2():
-    # 업무 레벨에 따라 No링 잘 하기
-    # no 정렬 방식 활용 해보기
-    add_tk = Tk()
-    add_tk.title("업무 추가")
+
+    # print(get_iid()[6:8])
+    # Lv3 업무 선택 후 하위 업무를 선택하면 에러 메시지 구현
+    if get_iid()[6:8] != '00':
+        msgbox.showerror("에러-하위 업무 추가", "최하위단 업무를 선택하셨습니다.\n\n 상위 업무를 선택해주세요.")
+        return
+
+    try:
+        add_tk = Tk()
+        add_tk.title("하위 업무 추가")
 
 
-    def add_db():
+        def add_db():
+            wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+            db_ws = wb['DB']
+            # values_only=True를 해야 위치값이 아닌 실제 데이터 값이 도출됨
+            db_header = db_ws.iter_rows(min_row=1, max_row=1, max_col=9, values_only=True)
+            db_datas = db_ws.iter_rows(min_row=2, max_col=9, values_only=True)
+            db_header = [r for r in db_header]
+            db_datas = [r for r in db_datas]
+            
+            # 선택 항목의 iid값 가져오기
+            for i in range(1, db_ws.max_row+1):
+                if db_ws.cell(i,1).value == get_iid():
+                    # print(i)
+                    r_selected = i
+            # print(db_datas[r_selected-2][0][3:8])
+            # print(db_datas[r_selected-2][0])        
+            
+            lv1_cnt = 0
+            lv2_cnt = 0
+            lv3_cnt = 0
+            for x in range(db_ws.max_row-2):
+                # print(db_datas[x][0][0:2])
+                # 선택 값이 1레벨 -> 하위 업무는 2레벨에 업무 추가
+                if db_datas[r_selected-2][0][3:8] == "00-00":
+                    if db_datas[x][0][0:2] == db_datas[r_selected-2][0][0:2]:
+                        lv1_cnt = int(db_datas[x][0][0:2])
+                        lv2_cnt = int(db_datas[x][0][3:5])
+
+                # 선택 값이 2레벨 -> 하위 업무는 3레벨에 업무 추가
+                elif db_datas[r_selected-2][0][6:8] == "00":
+                    if db_datas[x][0][0:5] == db_datas[r_selected-2][0][0:5]:
+                        lv1_cnt = int(db_datas[x][0][0:2])
+                        lv2_cnt = int(db_datas[x][0][3:5])
+                        lv3_cnt = int(db_datas[x][0][6:8])
+
+            # 다음 iid 값 넣기        
+            lv1_cnt = str(format(lv1_cnt,'02'))
+            
+            lv2_next = lv2_cnt+1
+            lv2_next = format(lv2_cnt+1,'02')
+            lv2_cnt = str(format(lv2_cnt,'02'))
+            
+            lv3_next = lv3_cnt+1
+            lv3_next = format(lv3_cnt+1,'02')
+            lv3_cnt = str(format(lv3_cnt,'02'))
+            
+            
+            # print(lv1_cnt + "-" + lv2_next + "-00")
+            # db_datas는 0부터 시작하고, 제목행이 빠져서 -2를 해야함
+            # 선택 값이 1레벨 -> 하위 업무는 2레벨에 업무 추가
+            if db_datas[r_selected-2][0][3:8] == "00-00":
+                r_add = db_ws.max_row + 1
+                db_ws.cell(row=r_add, column=1).value = lv1_cnt + "-" + lv2_next + "-00"
+                db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
+                db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
+                db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
+                db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
+                db_ws.cell(row=r_add, column=6).value = entry_date.get()
+                db_ws.cell(row=r_add, column=7).value = entry_time.get()
+                db_ws.cell(row=r_add, column=8).value = entry_note.get()
+                db_ws.cell(row=r_add, column=9).value = 2
+
+                wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+            
+            # 선택 값이 2레벨 -> 하위 업무는 3레벨에 업무 추가
+            elif db_datas[r_selected-2][0][6:8] == "00":
+                r_add = db_ws.max_row + 1
+                db_ws.cell(row=r_add, column=1).value = lv1_cnt + "-" + lv2_cnt + "-" + lv3_next
+                db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
+                db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
+                db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
+                db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
+                db_ws.cell(row=r_add, column=6).value = entry_date.get()
+                db_ws.cell(row=r_add, column=7).value = entry_time.get()
+                db_ws.cell(row=r_add, column=8).value = entry_note.get()
+                db_ws.cell(row=r_add, column=9).value = 3
+
+                wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+
+            msgbox.showinfo("알림", "하위 업무 추가가 완료되었습니다.")
+
+            add_tk.withdraw()
+            sort()
+            load_task()
+
+        # print(get_text)
+
+        tree.bind('<ButtonRelease-1>', get_text)
+        tree.bind('<ButtonRelease-1>', get_iid)
+
+        # 상위 업무명/내용
+        frame_upper_task_name = Frame(add_tk)
+        frame_upper_task_name.pack(fill="x")
+
+        lbl_upper_task = Label(frame_upper_task_name, text="상위 업무명/내용")
+        lbl_upper_task.pack(side="left")
+        
+        lbl_upper_task_name = Label(frame_upper_task_name, text=get_text())
+        lbl_upper_task_name.pack(side="right")
+        
+        # 업무명/내용
+        frame_task_name = Frame(add_tk)
+        frame_task_name.pack(fill="x")
+        
+        lbl_task_name = Label(frame_task_name, text="하위 추가 업무명/내용")
+        lbl_task_name.pack(side="left")
+
+        entry_task_name = Entry(frame_task_name)
+        entry_task_name.pack(side="right")
+
+        # 담당팀
+        frame_team_name = Frame(add_tk)
+        frame_team_name.pack(fill="x")
+
+        lbl_team_name = Label(frame_team_name, text="담당팀")
+        lbl_team_name.pack(side="left")
+
+        entry_team_name = Entry(frame_team_name)
+        entry_team_name.pack(side="right")
+
+        # 담당자
+        frame_person_name = Frame(add_tk)
+        frame_person_name.pack(fill="x")
+
+        lbl_person_name = Label(frame_person_name, text="담당자")
+        lbl_person_name.pack(side="left")
+
+        entry_person_name = Entry(frame_person_name)
+        entry_person_name.pack(side="right")
+
+        # 상황
+        frame_situation = Frame(add_tk)
+        frame_situation.pack(fill="x")
+
+        lbl_situation = Label(frame_situation, text="상황")
+        lbl_situation.pack(side="left")
+
+        opt_situation = ["진행","완료","검토","취소","중단","지연"]
+        cmb_situation = ttk.Combobox(frame_situation,state="readonly",
+        values=opt_situation)
+        cmb_situation.current(0)
+        cmb_situation.pack(side="right")
+
+        # 완료날짜
+        frame_date = Frame(add_tk)
+        frame_date.pack(fill="x")
+
+        lbl_date = Label(frame_date, text="완료날짜")
+        lbl_date.pack(side="left")
+
+        entry_date = Entry(frame_date)
+        entry_date.pack(side="right")
+        # entry_date.insert(END, "YY-MM-DD")
+
+        # 완료시간
+        frame_time = Frame(add_tk)
+        frame_time.pack(fill="x")
+
+        lbl_time = Label(frame_time, text="완료시간")
+        lbl_time.pack(side="left")
+
+        entry_time = Entry(frame_time)
+        entry_time.pack(side="right")
+        # entry_time.insert(END, "HH:MM")
+
+        
+        # 비고
+        frame_note = Frame(add_tk)
+        frame_note.pack(fill="x")
+
+        lbl_note = Label(frame_note, text="비고")
+        lbl_note.pack(side="left")
+
+        entry_note = Entry(frame_note)
+        entry_note.pack(side="right")
+
+        # fucntion2 frame
+        frame_func2 = Frame(add_tk)
+        frame_func2.pack(fill="x")
+
+        # add db
+        btn_add_db = Button(frame_func2, text="추가",command=add_db)
+        btn_add_db.pack(side="left")
+
+        # cancel button
+        # quit 함수를 쓰면 전체 프로그램이 종료되어서 withdraw 함수 사용함
+        btn_cancel = Button(frame_func2, text="취소", command=add_tk.withdraw)
+        btn_cancel.pack(side="right")
+
+        add_tk.mainloop()
+
+    except Exception as err:
+        msgbox.showerror("에러", err)
+
+
+def del_task():
+    try:
+        # print(get_iid())
         wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
         db_ws = wb['DB']
         # values_only=True를 해야 위치값이 아닌 실제 데이터 값이 도출됨
@@ -192,162 +436,216 @@ def add_task2():
         db_header = [r for r in db_header]
         db_datas = [r for r in db_datas]
         
+        # 선택 항목의 iid값 가져오기
         for i in range(1, db_ws.max_row+1):
             if db_ws.cell(i,1).value == get_iid():
                 # print(i)
                 r_selected = i
-        # print(db_datas[r_selected-2][0][3:8])
-        # print(db_datas[r_selected-2][0])        
         
-        lv1_cnt = 0
-        lv2_cnt = 0
-        lv3_cnt = 0
-        for x in range(db_ws.max_row-2):
-            # print(db_datas[x][0][0:2])
-            if db_datas[x][0][0:2] == db_datas[r_selected-2][0][0:2]:
-                lv1_cnt = int(db_datas[x][0][0:2])
-                lv2_cnt = int(db_datas[x][0][3:5])
-        lv1_cnt = format(lv1_cnt,'02')
-        lv2_next = lv2_cnt+1
-        lv2_next = format(lv2_cnt+1,'02')
-        # print(lv1_cnt + "-" + lv2_next + "-00")
-        # db_datas는 0부터 시작하고, 제목행이 빠져서 -2를 해야함
+        # db_ws.delete_rows(r_selected)
+
+        # 선택 값이 1레벨이면 하위 2,3레벨도 삭제
         if db_datas[r_selected-2][0][3:8] == "00-00":
-            r_add = db_ws.max_row + 1
-            db_ws.cell(row=r_add, column=1).value = lv1_cnt + "-" + lv2_next + "-00"
-            db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
-            db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
-            db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
-            db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
-            db_ws.cell(row=r_add, column=6).value = entry_date.get()
-            db_ws.cell(row=r_add, column=7).value = entry_time.get()
-            db_ws.cell(row=r_add, column=8).value = entry_note.get()
-            db_ws.cell(row=r_add, column=9).value = 2
+            for x in reversed(range(db_ws.max_row-1)):
+                if db_datas[x][0][0:2] == db_datas[r_selected-2][0][0:2]:
+                    db_ws.delete_rows(x+2)
+        # 선택 값이 2레벨이면 3레벨도 삭제
+        elif db_datas[r_selected-2][0][6:8] == "00":
+            for x in reversed(range(db_ws.max_row-1)):
+                if db_datas[x][0][0:5] == db_datas[r_selected-2][0][0:5]:
+                    db_ws.delete_rows(x+2)
+        # 선택 값이 3레벨이면 해당 행만 삭제
+        else:
+            db_ws.delete_rows(r_selected)
+
+        wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+        
+        msgbox.showinfo("알림", "선택한 업무 삭제 되었습니다.")
+        sort()
+        load_task()
+
+    except Exception as err:
+        msgbox.showerror("에러", err)
+
+def edit_task():
+    try:
+        add_tk = Tk()
+        add_tk.title("수정")
+
+
+        def apply():
+            # print(entry_task_name.get())
+                
+            wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+            db_ws = wb['DB']    
+            # values_only=True를 해야 위치값이 아닌 실제 데이터 값이 도출됨
+            # db_header = db_ws.iter_rows(min_row=1, max_row=1, max_col=9, values_only=True)
+            db_datas = db_ws.iter_rows(min_row=2, max_col=9, values_only=True)
+            # db_header = [r for r in db_header]
+            db_datas = [r for r in db_datas]
+            
+            
+            # 선택 항목의 iid값 가져오기
+            for i in range(1, db_ws.max_row+1):
+                if db_ws.cell(i,1).value == get_iid():
+                    # print(i)
+                    # r_selected = i
+                    db_ws.cell(i,2).value = entry_task_name.get()
+                    db_ws.cell(i,3).value = entry_team_name.get()
+                    db_ws.cell(i,4).value = entry_person_name.get()
+                    db_ws.cell(i,5).value = cmb_situation.get()
+                    db_ws.cell(i,6).value = entry_date.get()
+                    db_ws.cell(i,7).value = entry_time.get()
+                    db_ws.cell(i,8).value = entry_note.get()
 
             wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
 
-    # print(selectItem)
+            msgbox.showinfo("알림", "수정 되었습니다.")
 
-    tree.bind('<ButtonRelease-1>', selectItem)
-    tree.bind('<ButtonRelease-1>', get_iid)
+            add_tk.withdraw()
+            sort()
+            load_task()
 
-    # 상위 업무명/내용
-    frame_upper_task_name = Frame(add_tk)
-    frame_upper_task_name.pack(fill="x")
+        # print(get_iid())
 
-    lbl_upper_task = Label(frame_upper_task_name, text="업무명/내용 - 레벨1")
-    lbl_upper_task.pack(side="left")
-    
-    lbl_upper_task_name = Label(frame_upper_task_name, text=selectItem())
-    lbl_upper_task_name.pack(side="right")
-    
-    # 업무명/내용
-    frame_task_name = Frame(add_tk)
-    frame_task_name.pack(fill="x")
-    
-    lbl_task_name = Label(frame_task_name, text="업무명/내용 - 레벨2")
-    lbl_task_name.pack(side="left")
-
-    entry_task_name = Entry(frame_task_name)
-    entry_task_name.pack(side="right")
-
-    # 담당팀
-    frame_team_name = Frame(add_tk)
-    frame_team_name.pack(fill="x")
-
-    lbl_team_name = Label(frame_team_name, text="담당팀")
-    lbl_team_name.pack(side="left")
-
-    entry_team_name = Entry(frame_team_name)
-    entry_team_name.pack(side="right")
-
-    # 담당자
-    frame_person_name = Frame(add_tk)
-    frame_person_name.pack(fill="x")
-
-    lbl_person_name = Label(frame_person_name, text="담당자")
-    lbl_person_name.pack(side="left")
-
-    entry_person_name = Entry(frame_person_name)
-    entry_person_name.pack(side="right")
-
-    # 상황
-    frame_situation = Frame(add_tk)
-    frame_situation.pack(fill="x")
-
-    lbl_situation = Label(frame_situation, text="상황")
-    lbl_situation.pack(side="left")
-
-    opt_situation = ["진행","완료","검토","취소","중단","지연"]
-    cmb_situation = ttk.Combobox(frame_situation,state="readonly",
-    values=opt_situation)
-    cmb_situation.current(0)
-    cmb_situation.pack(side="right")
-
-    # 완료날짜
-    frame_date = Frame(add_tk)
-    frame_date.pack(fill="x")
-
-    lbl_date = Label(frame_date, text="완료날짜")
-    lbl_date.pack(side="left")
-
-    entry_date = Entry(frame_date)
-    entry_date.pack(side="right")
-    entry_date.insert(END, "YY-MM-DD")
-
-    # 완료시간
-    frame_time = Frame(add_tk)
-    frame_time.pack(fill="x")
-
-    lbl_time = Label(frame_time, text="완료시간")
-    lbl_time.pack(side="left")
-
-    entry_time = Entry(frame_time)
-    entry_time.pack(side="right")
-    entry_time.insert(END, "HH:MM")
-
-    
-    # 비고
-    frame_note = Frame(add_tk)
-    frame_note.pack(fill="x")
-
-    lbl_note = Label(frame_note, text="비고")
-    lbl_note.pack(side="left")
-
-    entry_note = Entry(frame_note)
-    entry_note.pack(side="right")
-
-    # fucntion2 frame
-    frame_func2 = Frame(add_tk)
-    frame_func2.pack(fill="x")
-
-    # add db
-    btn_add_db = Button(frame_func2, text="추가",command=add_db)
-    btn_add_db.pack(side="left")
-
-    # cancel button
-    # quit 함수를 쓰면 전체 프로그램이 종료되어서 withdraw 함수 사용함
-    btn_cancel = Button(frame_func2, text="취소", command=add_tk.withdraw)
-    btn_cancel.pack(side="right")
-
-    add_tk.mainloop()
+        wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+        db_ws = wb['DB']    
+        # values_only=True를 해야 위치값이 아닌 실제 데이터 값이 도출됨
+        # db_header = db_ws.iter_rows(min_row=1, max_row=1, max_col=9, values_only=True)
+        db_datas = db_ws.iter_rows(min_row=2, max_col=9, values_only=True)
+        # db_header = [r for r in db_header]
+        db_datas = [r for r in db_datas]
+        
+        
+        # 선택 항목의 iid값 가져오기
+        for i in range(1, db_ws.max_row+1):
+            if db_ws.cell(i,1).value == get_iid():
+                # print(i)
+                r_selected = i
+        # print(db_datas[r_selected-2][1])
+        
+        task_name = db_datas[r_selected-2][1]
+        # print(task_name)
+        team_name = db_datas[r_selected-2][2]
+        person_name = db_datas[r_selected-2][3]
+        situation = db_datas[r_selected-2][4]
+        d_date = db_datas[r_selected-2][5]
+        d_time = db_datas[r_selected-2][6]
+        note = db_datas[r_selected-2][7]
 
 
+        # for x in range(db_ws.max_row-1):
+
+        #     if db_datas[x][0] == db_datas[r_selected-2][0]:
+                # print(db_datas[x][0])
+                # print(db_datas[r_selected-2][0])
+
+        # 업무명/내용
+        frame_task_name = Frame(add_tk)
+        frame_task_name.pack(fill="x")
+        
+        lbl_task_name = Label(frame_task_name, text="업무명/내용")
+        lbl_task_name.pack(side="left")
+        
+        entry_task_name = Entry(frame_task_name)
+        # 기존 DB값 불러오기
+        entry_task_name.insert(0,task_name)
+
+        entry_task_name.pack(side="right")
+
+        # 담당팀
+        frame_team_name = Frame(add_tk)
+        frame_team_name.pack(fill="x")
+
+        lbl_team_name = Label(frame_team_name, text="담당팀")
+        lbl_team_name.pack(side="left")
+
+        entry_team_name = Entry(frame_team_name)
+        entry_team_name.insert(0,team_name)
+        entry_team_name.pack(side="right")
+
+        # 담당자
+        frame_person_name = Frame(add_tk)
+        frame_person_name.pack(fill="x")
+
+        lbl_person_name = Label(frame_person_name, text="담당자")
+        lbl_person_name.pack(side="left")
+
+        entry_person_name = Entry(frame_person_name)
+        entry_person_name.insert(0,person_name)
+        entry_person_name.pack(side="right")
+
+        # 상황
+        frame_situation = Frame(add_tk)
+        frame_situation.pack(fill="x")
+
+        lbl_situation = Label(frame_situation, text="상황")
+        lbl_situation.pack(side="left")
+
+        opt_situation = ["진행","완료","검토","취소","중단","지연"]
+        cmb_situation = ttk.Combobox(frame_situation,state="readonly",
+        values=opt_situation)
+        cmb_situation.current(0)
+        cmb_situation.pack(side="right")
+
+        # 완료날짜
+        frame_date = Frame(add_tk)
+        frame_date.pack(fill="x")
+
+        lbl_date = Label(frame_date, text="완료날짜")
+        lbl_date.pack(side="left")
+
+        entry_date = Entry(frame_date)
+        entry_date.insert(0,d_date)
+        entry_date.pack(side="right")
+        # entry_date.insert(END, "YY-MM-DD")
+
+        # 완료시간
+        frame_time = Frame(add_tk)
+        frame_time.pack(fill="x")
+
+        lbl_time = Label(frame_time, text="완료시간")
+        lbl_time.pack(side="left")
+
+        entry_time = Entry(frame_time)
+        entry_time.insert(0,d_time)
+        entry_time.pack(side="right")
+        # entry_time.insert(END, "HH:MM")
+
+        
+        # 비고
+        frame_note = Frame(add_tk)
+        frame_note.pack(fill="x")
+
+        lbl_note = Label(frame_note, text="비고")
+        lbl_note.pack(side="left")
+
+        entry_note = Entry(frame_note)
+        entry_note.insert(0,note)
+        entry_note.pack(side="right")
+
+
+        # fucntion2 frame
+        frame_func2 = Frame(add_tk)
+        frame_func2.pack(fill="x")
+
+        # add db
+        btn_apply = Button(frame_func2, text="수정반영",command=apply)
+        btn_apply.pack(side="left")
+
+        # cancel button
+        # quit 함수를 쓰면 전체 프로그램이 종료되어서 withdraw 함수 사용함
+        btn_cancel = Button(frame_func2, text="취소", command=add_tk.withdraw)
+        btn_cancel.pack(side="right")
+
+        add_tk.mainloop()
+
+
+
+    except Exception as err:
+        msgbox.showerror("에러", err)
 
 def load_task():
-    # 업무 레벨에 따라 No링 잘 하기
-    # no 정렬 방식 활용 해보기
-    # add_tk = Tk()
-    # add_tk.title("업무 추가")
-
-    # def add_db():
-    # excel = win32com.client.Dispatch("Excel.Application")
-
-    # wb = excel.Workbooks.Open("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
-    # db_ws = wb['DB']
-    # db_ws.Range('A2:I15').Sort(Key1=db_ws.Range('A1:I1'), Order=1, Orientation=1)
-    # wb.Save()
-    # excel.Application.Quit()
     
     wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
     db_ws = wb['DB']    
@@ -357,7 +655,9 @@ def load_task():
     db_header = [r for r in db_header]
     db_datas = [r for r in db_datas]
     
-
+    # treeview reset
+    # 이게 없으면 업무 추가시 기존 데이터가 2번 돌면서 iid가 또 있다고 하면서 에러가 남
+    tree.delete(*tree.get_children())
 
     for data in db_datas:
         # print(data[0][6:8])
@@ -370,8 +670,6 @@ def load_task():
         else :
             lv3 = tree.insert(lv2,'end',iid=data[0], text=data[1] ,values=data[2:8])
 
-    # wb.Save()
-    # excel.Application.Quit()
 
 def sort():
     db_df = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx", sheet_name='DB')
@@ -395,13 +693,22 @@ def sort():
             ws1[cell.coordinate].value = cell.value
     wb1.save(path1)
 
+# class Main(tk.Frame):
+#     def __init__(self, parent):
+#     # def __init__(self, parent):
 
+#         tk.Frame.__init__(self, parent)
+        # tk.Frame.__init__(self, parent)
+
+# if __name__ == "__main__":
 
 win = Tk()
 win.title("To Do List")
 
-tree = ttk.Treeview(win, selectmode='extended')
-# tree = ttk.Treeview(win, selectmode='browse')
+# browse : 1개만 선택
+# extended : 2개 이상 선택 가능
+# tree = ttk.Treeview(win, selectmode='extended')
+tree = ttk.Treeview(win, selectmode='browse')
 
 tree.pack(expand=True, fill="both")
 
@@ -431,12 +738,20 @@ func_frame = Frame(win)
 func_frame.pack(fill="x")
 
 # 업무 추가 버튼
-btn_add_task = Button(func_frame, text="업무추가", command=add_task)
+btn_add_task = Button(func_frame, text="신규 추가(Lv1)", command=add_task)
 btn_add_task.pack(side="left")
 
 # # 하위 업무 추가
-btn_add_task2 = Button(func_frame, text="하위 업무추가", command=add_task2)
+btn_add_task2 = Button(func_frame, text="하위 추가(Lv2~3)", command=add_task2)
 btn_add_task2.pack(side="left")
+
+# 삭제 버튼
+btn_del_task = Button(func_frame, text="삭제", command=del_task)
+btn_del_task.pack(side="left")
+
+# 편집 버튼
+btn_edit_task = Button(func_frame, text="수정", command=edit_task)
+btn_edit_task.pack(side="left")
 
 # 종료 버튼
 btn_close = Button(func_frame, text="종료", command=win.quit)
@@ -468,3 +783,4 @@ load_task()
 
 
 win.mainloop()
+
