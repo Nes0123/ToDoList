@@ -9,34 +9,9 @@ import tkinter.messagebox as msgbox
 import os
 
 
-# 필요 : class 사용하기, 업무 추가 후 안내 메시지 보내고 새로고침
+# 필요 : class 사용하기
 # 담당팀, 담당자 주소록 만들기, 편집, 삭제 기능
 # 스크롤바 추가
-# class load_db:
-    # def __init__(self,wb):
-    #     self.wb = wb
-
-#     def load_wb(self,path):
-#         wb = load_workbook(path)
-#         # print(path)
-#         # self.wb = wb    
-#         return wb
-
-# class load_excel:
-#     def __init__(self):                    
-#         wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
-#         db_ws = wb['DB']
-#         # values_only=True를 해야 위치값이 아닌 실제 데이터 값이 도출됨
-#         db_header = db_ws.iter_rows(min_row=1, max_row=1, max_col=9, values_only=True)
-#         db_datas = db_ws.iter_rows(min_row=2, max_col=9, values_only=True)
-
-#         db_header = [r for r in db_header]
-#         db_datas = [r for r in db_datas]
-#         wb.close()
-#         return db_datas
-# def refresh():
-#     win.destroy()
-#     os.popen("C:/Python/Code/ToDoList/ToDoList_v1.py")
 
 def add_task():
     try:
@@ -209,13 +184,6 @@ def get_iid():
     # print(selected_iid)
     # print(selected_item.get("text"))
     return selected_iid
-
-# def wordfinder(SearchString):
-#     for i in range(1, db_ws.max_row+1):
-#         if SearchString == db_ws.cell(i,1).value:
-#             print(i)
-#     return i
-
 
 def add_task2():
 
@@ -640,35 +608,36 @@ def edit_task():
 
         add_tk.mainloop()
 
-
-
     except Exception as err:
         msgbox.showerror("에러", err)
 
 def load_task():
-    
-    wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
-    db_ws = wb['DB']    
-    # values_only=True를 해야 위치값이 아닌 실제 데이터 값이 도출됨
-    db_header = db_ws.iter_rows(min_row=1, max_row=1, max_col=9, values_only=True)
-    db_datas = db_ws.iter_rows(min_row=2, max_col=9, values_only=True)
-    db_header = [r for r in db_header]
-    db_datas = [r for r in db_datas]
-    
-    # treeview reset
-    # 이게 없으면 업무 추가시 기존 데이터가 2번 돌면서 iid가 또 있다고 하면서 에러가 남
-    tree.delete(*tree.get_children())
+    try:
+        wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+        db_ws = wb['DB']    
+        # values_only=True를 해야 위치값이 아닌 실제 데이터 값이 도출됨
+        db_header = db_ws.iter_rows(min_row=1, max_row=1, max_col=9, values_only=True)
+        db_datas = db_ws.iter_rows(min_row=2, max_col=9, values_only=True)
+        db_header = [r for r in db_header]
+        db_datas = [r for r in db_datas]
+        
+        # treeview reset
+        # 이게 없으면 업무 추가시 기존 데이터가 2번 돌면서 iid가 또 있다고 하면서 에러가 남
+        tree.delete(*tree.get_children())
 
-    for data in db_datas:
-        # print(data[0][6:8])
-        # text 값이 있어야 하이라키구조 처럼 보여질 수 있음 (+-표시).
-        # lv1에만 open=true를 줘서 실행 시 lv2까지만 자동 보여주기    
-        if data[0][3:8] == '00-00':
-            lv1 = tree.insert('','end', iid=data[0], text=data[1], values=data[2:8], open=True)
-        elif '00' in data[0][6:8]:
-            lv2 = tree.insert(lv1,'end',iid=data[0], text=data[1] ,values=data[2:8])
-        else :
-            lv3 = tree.insert(lv2,'end',iid=data[0], text=data[1] ,values=data[2:8])
+        for data in db_datas:
+            # print(data[0][6:8])
+            # text 값이 있어야 하이라키구조 처럼 보여질 수 있음 (+-표시).
+            # lv1에만 open=true를 줘서 실행 시 lv2까지만 자동 보여주기    
+            if data[0][3:8] == '00-00':
+                lv1 = tree.insert('','end', iid=data[0], text=data[1], values=data[2:8], open=True)
+            elif '00' in data[0][6:8]:
+                lv2 = tree.insert(lv1,'end',iid=data[0], text=data[1] ,values=data[2:8])
+            else :
+                lv3 = tree.insert(lv2,'end',iid=data[0], text=data[1] ,values=data[2:8])
+
+    except Exception as err:
+        msgbox.showerror("에러", err)
 
 
 def sort():
@@ -693,23 +662,15 @@ def sort():
             ws1[cell.coordinate].value = cell.value
     wb1.save(path1)
 
-# class Main(tk.Frame):
-#     def __init__(self, parent):
-#     # def __init__(self, parent):
-
-#         tk.Frame.__init__(self, parent)
-        # tk.Frame.__init__(self, parent)
-
-# if __name__ == "__main__":
-
 win = Tk()
+win.geometry("800x500")
 win.title("To Do List")
+
 
 # browse : 1개만 선택
 # extended : 2개 이상 선택 가능
 # tree = ttk.Treeview(win, selectmode='extended')
 tree = ttk.Treeview(win, selectmode='browse')
-
 tree.pack(expand=True, fill="both")
 
 # # Number of rows to display, default is 10
@@ -733,9 +694,36 @@ tree.column("4", width=70, anchor='c')
 tree.column("5", width=70, anchor='c')
 tree.column("6", width=100)
 
+
+
+yscrollbar = Scrollbar(tree, orient="vertical", command=tree.yview)
+yscrollbar.pack(side="right", fill='y')
+tree.config(yscrollcommand=yscrollbar.set)
+
+
+# x스크롤바 실행 실패함.
+# xscrollbar = Scrollbar(tree, orient='horizontal', command=tree.xview)
+# xscrollbar = Scrollbar(tree, orient='horizontal')
+
+# # xscrollbar = Scrollbar(tree, orient=HORIZONTAL, command=tree.xview)
+# xscrollbar.pack(side="bottom", fill='x')
+
+# tree.config(xscrollcommand=xscrollbar.set)
+# xscrollbar.configure(command=tree.xview)
+
+# tree.config(xscrollcommand=xscrollbar.set)
+
+
+# yscrollbar.config(command=tree.yview)
+# xscrollbar.config(command=tree.xview)
+
+
 # function frame
+# func_frame = Frame(tree)
 func_frame = Frame(win)
-func_frame.pack(fill="x")
+
+func_frame.pack(side="bottom", fill="x")
+# func_frame.pack(fill="x")
 
 # 업무 추가 버튼
 btn_add_task = Button(func_frame, text="신규 추가(Lv1)", command=add_task)
@@ -759,28 +747,6 @@ btn_close.pack(side="right")
 
 sort()
 load_task()
-
-# column_names = ("team_name", "person_name", "situation",
-#                 "date","time","note")
-
-# # tree_main = tree(win, columns=column_names)
-
-# tree_main.heading("#0", text="업무명/내용")
-# tree_main.heading("team_name", text="담당팀")
-# tree_main.heading("person_name", text="담당자")
-# tree_main.heading("situation", text="상황")
-# tree_main.heading("date", text="완료날짜")
-# tree_main.heading("time", text="완료시간")
-# tree_main.heading("note", text="비고")
-
-# tree_main.column("1", width=100)
-# tree_main.column("2", width=100)
-# tree_main.column("3", width=50, anchor='c')
-# tree_main.column("4", width=70, anchor='c')
-# tree_main.column("5", width=70, anchor='c')
-# tree_main.column("6", width=100)
-
-
 
 win.mainloop()
 
