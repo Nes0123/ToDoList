@@ -1,17 +1,23 @@
 
 from openpyxl import load_workbook
 from tkinter import ttk
+import tkinter.ttk as ttk
 from tkinter import *
 import tkinter as tk 
 import win32com.client
 import pandas as pd
 import tkinter.messagebox as msgbox
 import os
+import tkinter.font as font
 
 
-# 필요 : class 사용하기
+# 필요 : class 사용하기, file name(os.getcwd)
 # 담당팀, 담당자 주소록 만들기, 편집, 삭제 기능
-# 스크롤바 추가
+# x스크롤바 추가
+
+def font_define():
+    func_font = font.Font(family='맑은 고딕', size=12)
+    return func_font
 
 def add_task():
     try:
@@ -19,7 +25,7 @@ def add_task():
         # no 정렬 방식 활용 해보기
         add_tk = Tk()
         add_tk.title("업무 추가")
-
+        add_tk.geometry("350x230")
         def add_db():
             wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
             db_ws = wb['DB']
@@ -74,47 +80,52 @@ def add_task():
             sort()
             load_task()
 
+        # func_font3 = font.Font(family='궁서', size=8)
+
 
         # 업무명/내용
         frame_task_name = Frame(add_tk)
         frame_task_name.pack(fill="x")
 
-        lbl_task_name = Label(frame_task_name, text="업무명/내용 - 레벨1")
+        lbl_task_name = Label(frame_task_name, text="업무명/내용 - 레벨1", font=('맑은 고딕',12))
+        # lbl_task_name = Label(frame_task_name, text="업무명/내용 - 레벨1", font=('맑은 고딕',12,'bold'))
+        # lbl_task_name['font'] = func_font2
         lbl_task_name.pack(side="left")
 
-        entry_task_name = Entry(frame_task_name)
+        entry_task_name = Entry(frame_task_name, font=('맑은 고딕',12))
         entry_task_name.pack(side="right")
 
         # 담당팀
         frame_team_name = Frame(add_tk)
         frame_team_name.pack(fill="x")
 
-        lbl_team_name = Label(frame_team_name, text="담당팀")
+        lbl_team_name = Label(frame_team_name, text="담당팀", font=('맑은 고딕',12))
+        # lbl_team_name['font'] = func_font3
         lbl_team_name.pack(side="left")
 
-        entry_team_name = Entry(frame_team_name)
+        entry_team_name = Entry(frame_team_name, font=('맑은 고딕',12))
         entry_team_name.pack(side="right")
 
         # 담당자
         frame_person_name = Frame(add_tk)
         frame_person_name.pack(fill="x")
 
-        lbl_person_name = Label(frame_person_name, text="담당자")
+        lbl_person_name = Label(frame_person_name, text="담당자", font=('맑은 고딕',12))
         lbl_person_name.pack(side="left")
 
-        entry_person_name = Entry(frame_person_name)
+        entry_person_name = Entry(frame_person_name, font=('맑은 고딕',12))
         entry_person_name.pack(side="right")
 
         # 상황
         frame_situation = Frame(add_tk)
         frame_situation.pack(fill="x")
 
-        lbl_situation = Label(frame_situation, text="상황")
+        lbl_situation = Label(frame_situation, text="상황", font=('맑은 고딕',12))
         lbl_situation.pack(side="left")
 
         opt_situation = ["진행","완료","검토","취소","중단","지연"]
         cmb_situation = ttk.Combobox(frame_situation,state="readonly",
-        values=opt_situation)
+        values=opt_situation, font=('맑은 고딕',12))
         cmb_situation.current(0)
         cmb_situation.pack(side="right")
 
@@ -122,10 +133,10 @@ def add_task():
         frame_date = Frame(add_tk)
         frame_date.pack(fill="x")
 
-        lbl_date = Label(frame_date, text="완료날짜")
+        lbl_date = Label(frame_date, text="완료날짜", font=('맑은 고딕',12))
         lbl_date.pack(side="left")
 
-        entry_date = Entry(frame_date)
+        entry_date = Entry(frame_date, font=('맑은 고딕',12))
         entry_date.pack(side="right")
         # entry_date.insert(END, "YY-MM-DD")
 
@@ -133,10 +144,10 @@ def add_task():
         frame_time = Frame(add_tk)
         frame_time.pack(fill="x")
 
-        lbl_time = Label(frame_time, text="완료시간")
+        lbl_time = Label(frame_time, text="완료시간", font=('맑은 고딕',12))
         lbl_time.pack(side="left")
 
-        entry_time = Entry(frame_time)
+        entry_time = Entry(frame_time, font=('맑은 고딕',12))
         entry_time.pack(side="right")
         # entry_time.insert(END, "HH:MM")
 
@@ -145,10 +156,10 @@ def add_task():
         frame_note = Frame(add_tk)
         frame_note.pack(fill="x")
 
-        lbl_note = Label(frame_note, text="비고")
+        lbl_note = Label(frame_note, text="비고", font=('맑은 고딕',12))
         lbl_note.pack(side="left")
 
-        entry_note = Entry(frame_note)
+        entry_note = Entry(frame_note, font=('맑은 고딕',12))
         entry_note.pack(side="right")
 
         # fucntion2 frame
@@ -156,12 +167,12 @@ def add_task():
         frame_func2.pack(fill="x")
 
         # add db
-        btn_add_db = Button(frame_func2, text="추가",command=add_db)
+        btn_add_db = Button(frame_func2, text="추가",command=add_db, font=('맑은 고딕',12), padx=5, pady=5)
         btn_add_db.pack(side="left")
 
         # cancel button
         # quit 함수를 쓰면 전체 프로그램이 종료되어서 withdraw 함수 사용함
-        btn_cancel = Button(frame_func2, text="취소", command=add_tk.withdraw)
+        btn_cancel = Button(frame_func2, text="취소", command=add_tk.withdraw, font=('맑은 고딕',12), padx=5, pady=5)
         btn_cancel.pack(side="right")
 
 
@@ -184,6 +195,15 @@ def get_iid():
     # print(selected_iid)
     # print(selected_item.get("text"))
     return selected_iid
+
+# def get_team():
+#     df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+#                         sheet_name = 'Team')
+#     print(df_team)
+    # for row in df_team:
+    #     if df_team['분류'][row] == list_team.get():
+    #         list_team2.insert(END,df_team['이름'][row])
+
 
 def add_task2():
 
@@ -251,13 +271,31 @@ def add_task2():
             if db_datas[r_selected-2][0][3:8] == "00-00":
                 r_add = db_ws.max_row + 1
                 db_ws.cell(row=r_add, column=1).value = lv1_cnt + "-" + lv2_next + "-00"
-                db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
-                db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
-                db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
+                if len(entry_task_name.get()) == 0:
+                    db_ws.cell(row=r_add, column=2).value = " "
+                else :    
+                    db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
+                if len(entry_team_name.get()) == 0 :
+                    db_ws.cell(row=r_add, column=3).value = " "
+                else :    
+                    db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
+                if len(entry_person_name.get()) == 0:
+                    db_ws.cell(row=r_add, column=4).value = " "
+                else :    
+                    db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
                 db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
-                db_ws.cell(row=r_add, column=6).value = entry_date.get()
-                db_ws.cell(row=r_add, column=7).value = entry_time.get()
-                db_ws.cell(row=r_add, column=8).value = entry_note.get()
+                if len(entry_date.get()) == 0:
+                    db_ws.cell(row=r_add, column=6).value = " "    
+                else :
+                    db_ws.cell(row=r_add, column=6).value = entry_date.get()
+                if len(entry_time.get()) == 0:
+                    db_ws.cell(row=r_add, column=7).value = " "
+                else :    
+                    db_ws.cell(row=r_add, column=7).value = entry_time.get()
+                if len(entry_note.get()) == 0:
+                    db_ws.cell(row=r_add, column=8).value = " "
+                else :     
+                    db_ws.cell(row=r_add, column=8).value = entry_note.get()
                 db_ws.cell(row=r_add, column=9).value = 2
 
                 wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
@@ -266,13 +304,32 @@ def add_task2():
             elif db_datas[r_selected-2][0][6:8] == "00":
                 r_add = db_ws.max_row + 1
                 db_ws.cell(row=r_add, column=1).value = lv1_cnt + "-" + lv2_cnt + "-" + lv3_next
-                db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
-                db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
-                db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
+
+                if len(entry_task_name.get()) == 0:
+                    db_ws.cell(row=r_add, column=2).value = " "
+                else :    
+                    db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
+                if len(entry_team_name.get()) == 0 :
+                    db_ws.cell(row=r_add, column=3).value = " "
+                else :    
+                    db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
+                if len(entry_person_name.get()) == 0:
+                    db_ws.cell(row=r_add, column=4).value = " "
+                else :    
+                    db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
                 db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
-                db_ws.cell(row=r_add, column=6).value = entry_date.get()
-                db_ws.cell(row=r_add, column=7).value = entry_time.get()
-                db_ws.cell(row=r_add, column=8).value = entry_note.get()
+                if len(entry_date.get()) == 0:
+                    db_ws.cell(row=r_add, column=6).value = " "    
+                else :
+                    db_ws.cell(row=r_add, column=6).value = entry_date.get()
+                if len(entry_time.get()) == 0:
+                    db_ws.cell(row=r_add, column=7).value = " "
+                else :    
+                    db_ws.cell(row=r_add, column=7).value = entry_time.get()
+                if len(entry_note.get()) == 0:
+                    db_ws.cell(row=r_add, column=8).value = " "
+                else :     
+                    db_ws.cell(row=r_add, column=8).value = entry_note.get()
                 db_ws.cell(row=r_add, column=9).value = 3
 
                 wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
@@ -283,6 +340,58 @@ def add_task2():
             sort()
             load_task()
 
+
+        def team_load():
+            # wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+            # team_ws = wb['Team']
+            # div_team = team_ws['A']
+            # lst_team = team_ws['B']
+            df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+                                    sheet_name = 'Team')
+            # print(df_team)
+            # print(df_team[df_team.분류 == '전실'])
+            # print(df_team['분류'][0])
+            
+            # print(df_team['분류'])
+            div_team = df_team['분류'].drop_duplicates()
+            # div_team = list(div_team)
+            # div_team = df_team['분류'].drop_duplicates(ignore_index=True)
+            div_team = div_team.reset_index()
+            div_team = div_team.drop('index',axis=1)
+            # print(div_team)
+            # print(len(div_team))
+            # print(div_team['분류'][1])
+            # div_team = df_team[]
+
+            for div in div_team["분류"]:
+                list_team.insert(END,div)
+            
+
+            def get_team(self):
+                # list_team2 reset
+                list_team2.delete(0,END)
+                # print(add_tk.focus())
+                # print("yes")
+                df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+                                    sheet_name = 'Team')
+                # print(list_team.curselection()[0])
+                # print(list_team.get(list_team.curselection(),list_team.curselection()))
+                # print(div_team['분류'][list_team.curselection()[0]])
+                for row in range(len(df_team['분류'])):
+                    if df_team['분류'][row] == div_team['분류'][list_team.curselection()[0]]:
+                        list_team2.insert(END,df_team['이름'][row])
+                
+                return list_team2.get(0,END)
+
+            ######bbox 사용해서 listbox 일때만 클릭되게 해보기?
+            add_tk.bind('<Button-1>',get_team)
+            # add_tk.bind('<ButtonRelease-1>',get_team)
+
+            # for row in df_team:
+            #     if df_team['분류'][row] == list_team.get():
+            #         list_team2.insert(END,df_team['이름'][row])
+
+        
         # print(get_text)
 
         tree.bind('<ButtonRelease-1>', get_text)
@@ -308,15 +417,95 @@ def add_task2():
         entry_task_name = Entry(frame_task_name)
         entry_task_name.pack(side="right")
 
-        # 담당팀
+        # 담당팀(단수)
         frame_team_name = Frame(add_tk)
         frame_team_name.pack(fill="x")
 
-        lbl_team_name = Label(frame_team_name, text="담당팀")
+        lbl_team_name = Label(frame_team_name, text="담당팀(단수)")
         lbl_team_name.pack(side="left")
 
         entry_team_name = Entry(frame_team_name)
         entry_team_name.pack(side="right")
+
+        # 담당팀(복수)
+        frame_team_name2 = Frame(add_tk)
+        # frame_team_name2.pack()
+        frame_team_name2.pack(fill="x")
+
+        lbl_team_name2 = Label(frame_team_name2, text="담당팀(복수)")
+        lbl_team_name2.pack(side="left")
+
+        # 담당팀(복수) - 리스트
+        frame_team_name3 = Frame(add_tk)
+        # frame_team_name3.pack()
+        # frame_team_name3.pack(side="left")
+        frame_team_name3.pack(fill="both")
+        # frame_team_name3.pack(fill="x")
+
+        yscrollbar = Scrollbar(frame_team_name3)
+        yscrollbar.pack(side="left", fill='y')
+
+        # xscrollbar x축의 절반만 나오게 하는 것 실패
+        xscrollbar = Scrollbar(frame_team_name3, orient=HORIZONTAL)
+        # xscrollbar.pack(side="bottom")
+        # xscrollbar.pack(side="bottom",expand=True)
+        # xscrollbar.pack(side="bottom", fill='x',expand=True)
+        xscrollbar.pack(side="bottom", fill='x')
+        
+        # xscrollbar.place(relwidth=0.5)
+
+        list_team = Listbox(frame_team_name3, selectmode="browse", height = 6,
+        yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set)
+
+
+        # list_team.pack(side="left", expand=1)
+        # list_team.place(x=0, y=200)
+        # list_team.pack(side="left", fill="y")
+        list_team.pack(side="left", fill="both", expand=True)
+
+
+        yscrollbar.config(command=list_team.yview)
+        xscrollbar.config(command=list_team.xview)
+
+
+
+        # 담당팀(복수) - 리스트
+        # frame_team_name5 = Frame(add_tk)
+        # frame_team_name5.pack()
+        # frame_team_name5.pack(side="right")
+
+        yscrollbar2 = Scrollbar(frame_team_name3)
+        yscrollbar2.pack(side="right", fill='y')
+
+        xscrollbar2 = Scrollbar(frame_team_name3, orient=HORIZONTAL)
+        # xscrollbar2.pack(side="bottom")
+        xscrollbar2.pack(side="bottom", fill='x',expand=True)
+
+        list_team2 = Listbox(frame_team_name3, selectmode="extended", height = 6,
+        yscrollcommand=yscrollbar2.set, xscrollcommand=xscrollbar2.set)
+
+        # list_file = Listbox(list_frame, selectmode="extended", height = 10,
+        # yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, wrap=NONE)
+        # list_team2.pack(side="left", expand=1)
+        list_team2.pack(side="right", fill="both", expand=True)
+
+
+        yscrollbar2.config(command=list_team2.yview)
+        xscrollbar2.config(command=list_team2.xview)
+
+
+        team_load()
+
+        # 담당팀 복수 버튼
+        frame_team_name4 = Frame(add_tk)
+        frame_team_name4.pack(fill="x")
+        frame_team_name4.pack(fill="x")
+
+        btn_team_load = Button(frame_team_name4, text='즐겨찾기 불러오기', command = team_load)
+        btn_team_load.pack(side="left")
+
+        btn_team_edit = Button(frame_team_name4, text='즐겨찾기 편집')
+        btn_team_edit.pack(side="left")
 
         # 담당자
         frame_person_name = Frame(add_tk)
@@ -458,13 +647,32 @@ def edit_task():
                 if db_ws.cell(i,1).value == get_iid():
                     # print(i)
                     # r_selected = i
-                    db_ws.cell(i,2).value = entry_task_name.get()
-                    db_ws.cell(i,3).value = entry_team_name.get()
-                    db_ws.cell(i,4).value = entry_person_name.get()
-                    db_ws.cell(i,5).value = cmb_situation.get()
-                    db_ws.cell(i,6).value = entry_date.get()
-                    db_ws.cell(i,7).value = entry_time.get()
-                    db_ws.cell(i,8).value = entry_note.get()
+
+                    if len(entry_task_name.get()) == 0:
+                        db_ws.cell(row=i, column=2).value = " "
+                    else :    
+                        db_ws.cell(row=i, column=2).value = entry_task_name.get()
+                    if len(entry_team_name.get()) == 0 :
+                        db_ws.cell(row=i, column=3).value = " "
+                    else :    
+                        db_ws.cell(row=i, column=3).value = entry_team_name.get()
+                    if len(entry_person_name.get()) == 0:
+                        db_ws.cell(row=i, column=4).value = " "
+                    else :    
+                        db_ws.cell(row=i, column=4).value = entry_person_name.get()
+                    db_ws.cell(row=i, column=5).value = cmb_situation.get()
+                    if len(entry_date.get()) == 0:
+                        db_ws.cell(row=i, column=6).value = " "    
+                    else :
+                        db_ws.cell(row=i, column=6).value = entry_date.get()
+                    if len(entry_time.get()) == 0:
+                        db_ws.cell(row=i, column=7).value = " "
+                    else :    
+                        db_ws.cell(row=i, column=7).value = entry_time.get()
+                    if len(entry_note.get()) == 0:
+                        db_ws.cell(row=i, column=8).value = " "
+                    else :     
+                        db_ws.cell(row=i, column=8).value = entry_note.get()
 
             wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
 
@@ -630,7 +838,8 @@ def load_task():
             # text 값이 있어야 하이라키구조 처럼 보여질 수 있음 (+-표시).
             # lv1에만 open=true를 줘서 실행 시 lv2까지만 자동 보여주기    
             if data[0][3:8] == '00-00':
-                lv1 = tree.insert('','end', iid=data[0], text=data[1], values=data[2:8], open=True)
+                lv1 = tree.insert('','end', iid=data[0], text=data[1], values=data[2:8])
+                # lv1 = tree.insert('','end', iid=data[0], text=data[1], values=data[2:8], open=True)
             elif '00' in data[0][6:8]:
                 lv2 = tree.insert(lv1,'end',iid=data[0], text=data[1] ,values=data[2:8])
             else :
@@ -666,12 +875,22 @@ win = Tk()
 win.geometry("800x500")
 win.title("To Do List")
 
+# font
+func_font = font.Font(family='맑은 고딕', size=12)
+func_font2 = font.Font(family='맑은 고딕', size=10)
+# func_font = font.Font(family='맑은 고딕', size=12, weight='bold')
+
 
 # browse : 1개만 선택
 # extended : 2개 이상 선택 가능
 # tree = ttk.Treeview(win, selectmode='extended')
 tree = ttk.Treeview(win, selectmode='browse')
 tree.pack(expand=True, fill="both")
+
+
+style = ttk.Style()
+# style.configure("Treview.Heading", font=('맑은 고딕',100))
+style.configure(".", font=('맑은 고딕',12), rowheight=30)
 
 # # Number of rows to display, default is 10
 tree['height'] = 20
@@ -722,28 +941,33 @@ tree.config(yscrollcommand=yscrollbar.set)
 # func_frame = Frame(tree)
 func_frame = Frame(win)
 
-func_frame.pack(side="bottom", fill="x")
+func_frame.pack(side="bottom", fill="x", padx=5, pady=5)
 # func_frame.pack(fill="x")
 
 # 업무 추가 버튼
-btn_add_task = Button(func_frame, text="신규 추가(Lv1)", command=add_task)
-btn_add_task.pack(side="left")
+btn_add_task = Button(func_frame, text="신규 추가(Lv1)", padx=5, pady=5, command=add_task)
+btn_add_task['font'] = func_font
+btn_add_task.pack(side="left", padx=5)
 
 # # 하위 업무 추가
-btn_add_task2 = Button(func_frame, text="하위 추가(Lv2~3)", command=add_task2)
-btn_add_task2.pack(side="left")
+btn_add_task2 = Button(func_frame, text="하위 추가(Lv2~3)", command=add_task2, padx=5, pady=5)
+btn_add_task2['font'] = func_font
+btn_add_task2.pack(side="left", padx=5)
 
 # 삭제 버튼
-btn_del_task = Button(func_frame, text="삭제", command=del_task)
-btn_del_task.pack(side="left")
+btn_del_task = Button(func_frame, text="삭제", command=del_task, padx=5, pady=5)
+btn_del_task['font'] = func_font
+btn_del_task.pack(side="left", padx=5)
 
 # 편집 버튼
-btn_edit_task = Button(func_frame, text="수정", command=edit_task)
-btn_edit_task.pack(side="left")
+btn_edit_task = Button(func_frame, text="수정", command=edit_task, padx=5, pady=5)
+btn_edit_task['font'] = func_font
+btn_edit_task.pack(side="left", padx=5)
 
 # 종료 버튼
-btn_close = Button(func_frame, text="종료", command=win.quit)
-btn_close.pack(side="right")
+btn_close = Button(func_frame, text="종료", command=win.quit, padx=5, pady=5)
+btn_close['font'] = func_font
+btn_close.pack(side="right", padx=5)
 
 sort()
 load_task()
