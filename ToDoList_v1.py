@@ -196,14 +196,16 @@ def get_iid():
     # print(selected_item.get("text"))
     return selected_iid
 
-# def get_team():
-#     df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
-#                         sheet_name = 'Team')
-#     print(df_team)
-    # for row in df_team:
-    #     if df_team['분류'][row] == list_team.get():
-    #         list_team2.insert(END,df_team['이름'][row])
+def get_team2(event):
+    print("get_team2")
+    value = list_team.get(list_team.curselection())
+    print(value)
+    # region_clicked = self.identify_region()
+    # region_clicked = self.identify_region(event.x, event.y)
+    # print(region_clicked)
 
+# def test(event):
+#     print("dkdkdk")
 
 def add_task2():
 
@@ -238,23 +240,29 @@ def add_task2():
             lv1_cnt = 0
             lv2_cnt = 0
             lv3_cnt = 0
-            for x in range(db_ws.max_row-2):
+            print(db_ws.max_row)
+            for x in range(db_ws.max_row-1):
                 # print(db_datas[x][0][0:2])
                 # 선택 값이 1레벨 -> 하위 업무는 2레벨에 업무 추가
                 if db_datas[r_selected-2][0][3:8] == "00-00":
+                    # print(db_datas[r_selected-2][0])
+                    print(x)        
+                    print(db_datas[x][0][0:2])
+                    print(db_datas[r_selected-2][0][0:2])
                     if db_datas[x][0][0:2] == db_datas[r_selected-2][0][0:2]:
                         lv1_cnt = int(db_datas[x][0][0:2])
                         lv2_cnt = int(db_datas[x][0][3:5])
-
+                        print(lv1_cnt)
                 # 선택 값이 2레벨 -> 하위 업무는 3레벨에 업무 추가
                 elif db_datas[r_selected-2][0][6:8] == "00":
                     if db_datas[x][0][0:5] == db_datas[r_selected-2][0][0:5]:
                         lv1_cnt = int(db_datas[x][0][0:2])
                         lv2_cnt = int(db_datas[x][0][3:5])
                         lv3_cnt = int(db_datas[x][0][6:8])
-
+            # print(lv1_cnt)
             # 다음 iid 값 넣기        
             lv1_cnt = str(format(lv1_cnt,'02'))
+            print(lv1_cnt)
             
             lv2_next = lv2_cnt+1
             lv2_next = format(lv2_cnt+1,'02')
@@ -264,75 +272,176 @@ def add_task2():
             lv3_next = format(lv3_cnt+1,'02')
             lv3_cnt = str(format(lv3_cnt,'02'))
             
+            # print(rad_var.get())
             
             # print(lv1_cnt + "-" + lv2_next + "-00")
             # db_datas는 0부터 시작하고, 제목행이 빠져서 -2를 해야함
             # 선택 값이 1레벨 -> 하위 업무는 2레벨에 업무 추가
             if db_datas[r_selected-2][0][3:8] == "00-00":
-                r_add = db_ws.max_row + 1
-                db_ws.cell(row=r_add, column=1).value = lv1_cnt + "-" + lv2_next + "-00"
-                if len(entry_task_name.get()) == 0:
-                    db_ws.cell(row=r_add, column=2).value = " "
-                else :    
-                    db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
-                if len(entry_team_name.get()) == 0 :
-                    db_ws.cell(row=r_add, column=3).value = " "
-                else :    
-                    db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
-                if len(entry_person_name.get()) == 0:
-                    db_ws.cell(row=r_add, column=4).value = " "
-                else :    
-                    db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
-                db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
-                if len(entry_date.get()) == 0:
-                    db_ws.cell(row=r_add, column=6).value = " "    
-                else :
-                    db_ws.cell(row=r_add, column=6).value = entry_date.get()
-                if len(entry_time.get()) == 0:
-                    db_ws.cell(row=r_add, column=7).value = " "
-                else :    
-                    db_ws.cell(row=r_add, column=7).value = entry_time.get()
-                if len(entry_note.get()) == 0:
-                    db_ws.cell(row=r_add, column=8).value = " "
-                else :     
-                    db_ws.cell(row=r_add, column=8).value = entry_note.get()
-                db_ws.cell(row=r_add, column=9).value = 2
+                # 단일팀/사람
+                if rad_var.get() == 1 :
+                    # print("rad_var == 1")
+                    r_add = db_ws.max_row + 1
+                    db_ws.cell(row=r_add, column=1).value = lv1_cnt + "-" + lv2_next + "-00"
+                    if len(entry_task_name.get()) == 0:
+                        db_ws.cell(row=r_add, column=2).value = " "
+                    else :    
+                        db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
+                    if len(entry_team_name.get()) == 0 :
+                        db_ws.cell(row=r_add, column=3).value = " "
+                    else :    
+                        db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
+                    if len(entry_person_name.get()) == 0:
+                        db_ws.cell(row=r_add, column=4).value = " "
+                    else :    
+                        db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
+                    db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
+                    if len(entry_date.get()) == 0:
+                        db_ws.cell(row=r_add, column=6).value = " "    
+                    else :
+                        db_ws.cell(row=r_add, column=6).value = entry_date.get()
+                    if len(entry_time.get()) == 0:
+                        db_ws.cell(row=r_add, column=7).value = " "
+                    else :    
+                        db_ws.cell(row=r_add, column=7).value = entry_time.get()
+                    if len(entry_note.get()) == 0:
+                        db_ws.cell(row=r_add, column=8).value = " "
+                    else :     
+                        db_ws.cell(row=r_add, column=8).value = entry_note.get()
+                    db_ws.cell(row=r_add, column=9).value = 2
 
-                wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
-            
+                    wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+                # 다수 팀
+                elif rad_var.get() == 2 :
+                    # print("rad_var==2")
+                    print(lv1_cnt)
+                    file_cnt = list_team2.size()
+                    if file_cnt > 0 :
+                        for j in range(file_cnt):
+                            # print(list_team2.get(0,END)[j])
+                            # print(lv2_next)
+                            r_add = db_ws.max_row + 1
+                            db_ws.cell(row=r_add, column=1).value = lv1_cnt + "-" + lv2_next + "-00"
+                            print(db_ws.cell(row=r_add, column=1).value)
+                            if len(entry_task_name.get()) == 0:
+                                db_ws.cell(row=r_add, column=2).value = " "
+                            else :    
+                                db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
+                            # if len(entry_team_name.get()) == 0 :
+                                # return
+                                # db_ws.cell(row=r_add, column=3).value = " "
+                            # else :    
+                            db_ws.cell(row=r_add, column=3).value = list_team2.get(0,END)[j]
+                            
+                            if len(entry_person_name.get()) == 0:
+                                db_ws.cell(row=r_add, column=4).value = " "
+                            else :    
+                                db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
+                            db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
+                            if len(entry_date.get()) == 0:
+                                db_ws.cell(row=r_add, column=6).value = " "    
+                            else :
+                                db_ws.cell(row=r_add, column=6).value = entry_date.get()
+                            if len(entry_time.get()) == 0:
+                                db_ws.cell(row=r_add, column=7).value = " "
+                            else :    
+                                db_ws.cell(row=r_add, column=7).value = entry_time.get()
+                            if len(entry_note.get()) == 0:
+                                db_ws.cell(row=r_add, column=8).value = " "
+                            else :     
+                                db_ws.cell(row=r_add, column=8).value = entry_note.get()
+                            db_ws.cell(row=r_add, column=9).value = 2
+
+                            wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+
+                            lv2_next = int(lv2_next)
+                            lv2_next = format(lv2_next+1,'02')
+
+                            # lv2_next += 1
+                        
             # 선택 값이 2레벨 -> 하위 업무는 3레벨에 업무 추가
             elif db_datas[r_selected-2][0][6:8] == "00":
-                r_add = db_ws.max_row + 1
-                db_ws.cell(row=r_add, column=1).value = lv1_cnt + "-" + lv2_cnt + "-" + lv3_next
+                # 단일팀/사람
+                if rad_var.get() == 1 :
+                    r_add = db_ws.max_row + 1
+                    db_ws.cell(row=r_add, column=1).value = lv1_cnt + "-" + lv2_cnt + "-" + lv3_next
 
-                if len(entry_task_name.get()) == 0:
-                    db_ws.cell(row=r_add, column=2).value = " "
-                else :    
-                    db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
-                if len(entry_team_name.get()) == 0 :
-                    db_ws.cell(row=r_add, column=3).value = " "
-                else :    
-                    db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
-                if len(entry_person_name.get()) == 0:
-                    db_ws.cell(row=r_add, column=4).value = " "
-                else :    
-                    db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
-                db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
-                if len(entry_date.get()) == 0:
-                    db_ws.cell(row=r_add, column=6).value = " "    
-                else :
-                    db_ws.cell(row=r_add, column=6).value = entry_date.get()
-                if len(entry_time.get()) == 0:
-                    db_ws.cell(row=r_add, column=7).value = " "
-                else :    
-                    db_ws.cell(row=r_add, column=7).value = entry_time.get()
-                if len(entry_note.get()) == 0:
-                    db_ws.cell(row=r_add, column=8).value = " "
-                else :     
-                    db_ws.cell(row=r_add, column=8).value = entry_note.get()
-                db_ws.cell(row=r_add, column=9).value = 3
+                    if len(entry_task_name.get()) == 0:
+                        db_ws.cell(row=r_add, column=2).value = " "
+                    else :    
+                        db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
+                    if len(entry_team_name.get()) == 0 :
+                        db_ws.cell(row=r_add, column=3).value = " "
+                    else :    
+                        db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
+                    if len(entry_person_name.get()) == 0:
+                        db_ws.cell(row=r_add, column=4).value = " "
+                    else :    
+                        db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
+                    db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
+                    if len(entry_date.get()) == 0:
+                        db_ws.cell(row=r_add, column=6).value = " "    
+                    else :
+                        db_ws.cell(row=r_add, column=6).value = entry_date.get()
+                    if len(entry_time.get()) == 0:
+                        db_ws.cell(row=r_add, column=7).value = " "
+                    else :    
+                        db_ws.cell(row=r_add, column=7).value = entry_time.get()
+                    if len(entry_note.get()) == 0:
+                        db_ws.cell(row=r_add, column=8).value = " "
+                    else :     
+                        db_ws.cell(row=r_add, column=8).value = entry_note.get()
+                    db_ws.cell(row=r_add, column=9).value = 3
 
-                wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+                    wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+
+                # 다수 팀
+                elif rad_var.get() == 2 :
+                    # print("rad_var==2")
+                    # print(lv1_cnt)
+                    file_cnt = list_team2.size()
+                    if file_cnt > 0 :
+                        for j in range(file_cnt):
+                            # print(list_team2.get(0,END)[j])
+                            # print(lv2_next)
+                            r_add = db_ws.max_row + 1
+                            db_ws.cell(row=r_add, column=1).value = lv1_cnt + "-" + lv2_cnt + "-" + lv3_next
+                            if len(entry_task_name.get()) == 0:
+                                db_ws.cell(row=r_add, column=2).value = " "
+                            else :    
+                                db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
+                            # if len(entry_team_name.get()) == 0 :
+                                # return
+                                # db_ws.cell(row=r_add, column=3).value = " "
+                            # else :    
+                            db_ws.cell(row=r_add, column=3).value = list_team2.get(0,END)[j]
+                            
+                            if len(entry_person_name.get()) == 0:
+                                db_ws.cell(row=r_add, column=4).value = " "
+                            else :    
+                                db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
+                            db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
+                            if len(entry_date.get()) == 0:
+                                db_ws.cell(row=r_add, column=6).value = " "    
+                            else :
+                                db_ws.cell(row=r_add, column=6).value = entry_date.get()
+                            if len(entry_time.get()) == 0:
+                                db_ws.cell(row=r_add, column=7).value = " "
+                            else :    
+                                db_ws.cell(row=r_add, column=7).value = entry_time.get()
+                            if len(entry_note.get()) == 0:
+                                db_ws.cell(row=r_add, column=8).value = " "
+                            else :     
+                                db_ws.cell(row=r_add, column=8).value = entry_note.get()
+                            db_ws.cell(row=r_add, column=9).value = 2
+
+                            wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+
+                            lv2_next = int(lv2_next)
+                            lv2_next = format(lv2_next+1,'02')
+
+                            # lv2_next += 1
+
 
             msgbox.showinfo("알림", "하위 업무 추가가 완료되었습니다.")
 
@@ -342,6 +451,8 @@ def add_task2():
 
 
         def team_load():
+
+
             # wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
             # team_ws = wb['Team']
             # div_team = team_ws['A']
@@ -365,26 +476,43 @@ def add_task2():
 
             for div in div_team["분류"]:
                 list_team.insert(END,div)
-            
+                        
+        # def test(event):
+        #     print("dkdkdk")
 
-            def get_team(self):
-                # list_team2 reset
-                list_team2.delete(0,END)
-                # print(add_tk.focus())
-                # print("yes")
-                df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+        def get_team(self):
+            # 아래 문구가 있어야 list_team의 값이 다른 곳에 클릭을 해도 값이 유지가 됨
+            list_team.get(list_team.curselection())
+            # value = list_team.get(list_team.curselection())
+            # print(value)
+
+            df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
                                     sheet_name = 'Team')
-                # print(list_team.curselection()[0])
-                # print(list_team.get(list_team.curselection(),list_team.curselection()))
-                # print(div_team['분류'][list_team.curselection()[0]])
-                for row in range(len(df_team['분류'])):
-                    if df_team['분류'][row] == div_team['분류'][list_team.curselection()[0]]:
-                        list_team2.insert(END,df_team['이름'][row])
-                
-                return list_team2.get(0,END)
+            div_team = df_team['분류'].drop_duplicates()
+            div_team = div_team.reset_index()
+            div_team = div_team.drop('index',axis=1)
+            for div in div_team["분류"]:
+                list_team.insert(END,div)
+
+            # list_team2 reset
+            list_team2.delete(0,END)
+            # print(add_tk.focus())
+            # print("yes")
+            # df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+            #                     sheet_name = 'Team')
+            # print(list_team.curselection()[0])
+            # print(list_team.get(list_team.curselection(),list_team.curselection()))
+            # print(div_team['분류'][list_team.curselection()[0]])
+            for row in range(len(df_team['분류'])):
+                if df_team['분류'][row] == div_team['분류'][list_team.curselection()[0]]:
+                    list_team2.insert(END,df_team['이름'][row])
+            
+            # return list_team2.get(0,END)
 
             ######bbox 사용해서 listbox 일때만 클릭되게 해보기?
-            add_tk.bind('<Button-1>',get_team)
+
+            # add_tk.bind('<Button-1>',get_team2)
+            # add_tk.bind('<Button-1>',get_team)
             # add_tk.bind('<ButtonRelease-1>',get_team)
 
             # for row in df_team:
@@ -416,6 +544,25 @@ def add_task2():
 
         entry_task_name = Entry(frame_task_name)
         entry_task_name.pack(side="right")
+
+        # 라디오버튼
+        frame_radio = LabelFrame(add_tk, text="선택")
+        frame_radio.pack(fill="x")
+
+        # master를 추가 안 하면 무조건 0 값만 나옴 
+        rad_var = IntVar(master=add_tk)
+        rbt_one = Radiobutton(frame_radio, text="단일 팀/사람", value=1, variable=rad_var)
+        rbt_teams = Radiobutton(frame_radio, text="다수 팀", value=2, variable=rad_var)
+        rbt_people = Radiobutton(frame_radio, text="다수 담당자", value=3, variable=rad_var)
+
+        # 기본값 선택
+        rbt_one.select()
+        # rbt_teams.select()
+
+        rbt_one.pack(side="left")
+        rbt_teams.pack(side="left")
+        rbt_people.pack(side="left")
+
 
         # 담당팀(단수)
         frame_team_name = Frame(add_tk)
@@ -457,6 +604,7 @@ def add_task2():
         list_team = Listbox(frame_team_name3, selectmode="browse", height = 6,
         yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set)
 
+        list_team.bind('<<ListboxSelect>>',get_team)        
 
         # list_team.pack(side="left", expand=1)
         # list_team.place(x=0, y=200)
@@ -562,6 +710,8 @@ def add_task2():
 
         entry_note = Entry(frame_note)
         entry_note.pack(side="right")
+
+
 
         # fucntion2 frame
         frame_func2 = Frame(add_tk)
