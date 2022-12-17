@@ -9,6 +9,7 @@ import pandas as pd
 import tkinter.messagebox as msgbox
 import os
 import tkinter.font as font
+import time
 
 
 # 필요 : class 사용하기, file name(os.getcwd)
@@ -196,16 +197,218 @@ def get_iid():
     # print(selected_item.get("text"))
     return selected_iid
 
-def get_team2(event):
-    print("get_team2")
-    value = list_team.get(list_team.curselection())
-    print(value)
+# def get_team2(event):
+#     print("get_team2")
+#     value = list_team.get(list_team.curselection())
+#     print(value)
     # region_clicked = self.identify_region()
     # region_clicked = self.identify_region(event.x, event.y)
     # print(region_clicked)
 
-# def test(event):
-#     print("dkdkdk")
+def fav_person_edit():
+    pass
+    
+
+def fav_team_edit():
+    fav_edit = Tk()
+    fav_edit.title("팀 - 즐겨찾기 수정")
+
+
+    def team_load():
+        df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+                                sheet_name = 'Team')
+        # print(df_team)
+        # print(df_team[df_team.분류 == '전실'])
+        # print(df_team['분류'][0])
+        
+        # print(df_team['분류'])
+        div_team = df_team['분류'].drop_duplicates()
+        # div_team = list(div_team)
+        # div_team = df_team['분류'].drop_duplicates(ignore_index=True)
+        div_team = div_team.reset_index()
+        div_team = div_team.drop('index',axis=1)
+        # print(div_team)
+        # print(len(div_team))
+        # print(div_team['분류'][1])
+        # div_team = df_team[]
+
+        for div in div_team["분류"]:
+            list_team.insert(END,div)
+
+
+    def get_team(self):
+    # def get_team():
+        # 아래 문구가 있어야 list_team의 값이 다른 곳에 클릭을 해도 값이 유지가 됨
+        global div_value
+        div_value = list_team.get(list_team.curselection())
+        # value = list_team.get(list_team.curselection())
+        # print(value)
+
+        df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+                                sheet_name = 'Team')
+        div_team = df_team['분류'].drop_duplicates()
+        div_team = div_team.reset_index()
+        div_team = div_team.drop('index',axis=1)
+        # for div in div_team["분류"]:
+        #     list_team.insert(END,div)
+
+        # list_team2 reset
+        list_team2.delete(0,END)
+        # print(add_tk.focus())
+        # print("yes")
+        # df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+        #                     sheet_name = 'Team')
+        # print(list_team.curselection()[0])
+        # print(list_team.get(list_team.curselection(),list_team.curselection()))
+        # print(div_team['분류'][list_team.curselection()[0]])
+        for row in range(len(df_team['분류'])):
+            if df_team['분류'][row] == div_team['분류'][list_team.curselection()[0]]:
+                list_team2.insert(END,df_team['이름'][row])
+                # print(df_team['이름'][row])
+
+        
+        entry_team_div.delete(0,END)
+        entry_team_div.insert(END, div_team['분류'][list_team.curselection()[0]])
+
+        # print(list_team2.get(0,END)[list_team2.curselection()[0]])
+        # print(list_team2.curselection()[0])
+        # entry_team_name.delete(0,END)
+        # entry_team_name.insert(END, df_team['이름'][list_team2.curselection()[0]])
+        # print(div_team['분류'][list_team.curselection()[0]])
+        # return print(div_team['분류'][list_team.curselection()[0]])
+        # return div_value
+
+
+    def get_team_name(self):
+        # list_team2.get(list_team2.curselection())
+        # print(get_team())
+        # get_team(self)
+        # print(div_value)
+        df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+                                sheet_name = 'Team')
+        div_team = df_team['분류'].drop_duplicates()
+        div_team = div_team.reset_index()
+        div_team = div_team.drop('index',axis=1)
+        
+        # print(list_team2.curselection())
+        print(list_team2.curselection()[0])
+        # print(list_team2.get(0,END)[list_team2.curselection()[0]])
+        # print(div_team['분류'][list_team.curselection()[0]])
+
+        # print(df_team['이름'][list_team2.curselection()[0]])
+        team_name = []
+        for row in range(len(df_team['분류'])):
+            # print(df_team['분류'][row])
+            # print()
+            if df_team['분류'][row] == div_value:
+                team_name.append(df_team['이름'][row])
+                # print(df_team['이름'][row])
+                # print(row)
+                # print(df_team['분류'][row])
+
+                # for row2 in range(len(df_team['이름'])):
+                #     list_team2.insert(END,df_team['이름'][row])
+        # print(team_name[list_team2.curselection()[0]])
+        entry_team_name.delete(0,END)
+        entry_team_name.insert(END,team_name[list_team2.curselection()[0]])
+
+    # 분류 프레임
+    frame_team_div = Frame(fav_edit)
+    frame_team_div.pack(fill="x")
+
+    lbl_team_div = Label(frame_team_div, text="분류")
+    lbl_team_div.pack(side="left")
+
+    entry_team_div = Entry(frame_team_div)
+    entry_team_div.pack(side="right")
+
+    # 팀 이름 프레임
+    frame_team_name = Frame(fav_edit)
+    frame_team_name.pack(fill="x")
+
+    lbl_team_name = Label(frame_team_name, text="이름")
+    lbl_team_name.pack(side="left")
+
+    entry_team_name = Entry(frame_team_name)
+    entry_team_name.pack(side="right")
+
+
+
+    # 담당팀(복수)
+    frame_team_name2 = Frame(fav_edit)
+    # frame_team_name2.pack()
+    frame_team_name2.pack(fill="x")
+
+    lbl_team_name2 = Label(frame_team_name2, text="2) 담당팀(다수)")
+    lbl_team_name2.pack(side="left")
+
+
+    # 담당팀(복수) - 리스트
+    frame_team_name3 = Frame(fav_edit)
+    # frame_team_name3.pack()
+    # frame_team_name3.pack(side="left")
+    frame_team_name3.pack(fill="both")
+    # frame_team_name3.pack(fill="x")
+
+    yscrollbar = Scrollbar(frame_team_name3)
+    yscrollbar.pack(side="left", fill='y')
+
+    # xscrollbar x축의 절반만 나오게 하는 것 실패
+    xscrollbar = Scrollbar(frame_team_name3, orient=HORIZONTAL)
+    # xscrollbar.pack(side="bottom")
+    # xscrollbar.pack(side="bottom",expand=True)
+    # xscrollbar.pack(side="bottom", fill='x',expand=True)
+    xscrollbar.pack(side="bottom", fill='x')
+    
+    # xscrollbar.place(relwidth=0.5)
+
+    list_team = Listbox(frame_team_name3, selectmode="browse", height = 6,
+    yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set)
+
+    list_team.bind('<<ListboxSelect>>',get_team)        
+
+    # list_team.pack(side="left", expand=1)
+    # list_team.place(x=0, y=200)
+    # list_team.pack(side="left", fill="y")
+    list_team.pack(side="left", fill="both", expand=True)
+
+
+    yscrollbar.config(command=list_team.yview)
+    xscrollbar.config(command=list_team.xview)
+
+    # get_team()
+
+    # 담당팀(복수) - 리스트
+    # frame_team_name5 = Frame(add_tk)
+    # frame_team_name5.pack()
+    # frame_team_name5.pack(side="right")
+
+    yscrollbar2 = Scrollbar(frame_team_name3)
+    yscrollbar2.pack(side="right", fill='y')
+
+    xscrollbar2 = Scrollbar(frame_team_name3, orient=HORIZONTAL)
+    # xscrollbar2.pack(side="bottom")
+    xscrollbar2.pack(side="bottom", fill='x',expand=True)
+
+    list_team2 = Listbox(frame_team_name3, selectmode="extended", height = 6,
+    yscrollcommand=yscrollbar2.set, xscrollcommand=xscrollbar2.set)
+
+    # list_file = Listbox(list_frame, selectmode="extended", height = 10,
+    # yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, wrap=NONE)
+    # list_team2.pack(side="left", expand=1)
+    list_team2.pack(side="right", fill="both", expand=True)
+
+
+    yscrollbar2.config(command=list_team2.yview)
+    xscrollbar2.config(command=list_team2.xview)
+
+    list_team2.bind('<<ListboxSelect>>',get_team_name)        
+
+    team_load()
+
+
+    fav_edit.mainloop()
+
 
 def add_task2():
 
@@ -357,7 +560,54 @@ def add_task2():
                             lv2_next = int(lv2_next)
                             lv2_next = format(lv2_next+1,'02')
 
-                            # lv2_next += 1
+                # 다수 담당자
+                elif rad_var.get() == 3 :
+                    # print("rad_var==2")
+                    # print(lv1_cnt)
+                    file_cnt = list_person2.size()
+                    if file_cnt > 0 :
+                        for j in range(file_cnt):
+                            # print(list_team2.get(0,END)[j])
+                            # print(lv2_next)
+                            r_add = db_ws.max_row + 1
+                            db_ws.cell(row=r_add, column=1).value = lv1_cnt + "-" + lv2_next + "-00"
+                            print(db_ws.cell(row=r_add, column=1).value)
+                            if len(entry_task_name.get()) == 0:
+                                db_ws.cell(row=r_add, column=2).value = " "
+                            else :    
+                                db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
+                            if len(entry_team_name.get()) == 0 :
+                                db_ws.cell(row=r_add, column=3).value = " "
+                            else :    
+                                db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
+                            
+                            # if len(entry_person_name.get()) == 0:
+                            #     db_ws.cell(row=r_add, column=4).value = " "
+                            # else :    
+                            #     db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
+                            
+                            db_ws.cell(row=r_add, column=4).value = list_person2.get(0,END)[j]                            
+
+                            db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
+                            if len(entry_date.get()) == 0:
+                                db_ws.cell(row=r_add, column=6).value = " "    
+                            else :
+                                db_ws.cell(row=r_add, column=6).value = entry_date.get()
+                            if len(entry_time.get()) == 0:
+                                db_ws.cell(row=r_add, column=7).value = " "
+                            else :    
+                                db_ws.cell(row=r_add, column=7).value = entry_time.get()
+                            if len(entry_note.get()) == 0:
+                                db_ws.cell(row=r_add, column=8).value = " "
+                            else :     
+                                db_ws.cell(row=r_add, column=8).value = entry_note.get()
+                            db_ws.cell(row=r_add, column=9).value = 2
+
+                            wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+
+                            lv2_next = int(lv2_next)
+                            lv2_next = format(lv2_next+1,'02')
+
                         
             # 선택 값이 2레벨 -> 하위 업무는 3레벨에 업무 추가
             elif db_datas[r_selected-2][0][6:8] == "00":
@@ -437,10 +687,56 @@ def add_task2():
 
                             wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
 
-                            lv2_next = int(lv2_next)
-                            lv2_next = format(lv2_next+1,'02')
+                            lv3_next = int(lv3_next)
+                            lv3_next = format(lv3_next+1,'02')
 
-                            # lv2_next += 1
+                # 다수 담당자
+                elif rad_var.get() == 3 :
+                    # print("rad_var==2")
+                    # print(lv1_cnt)
+                    file_cnt = list_person2.size()
+                    if file_cnt > 0 :
+                        for j in range(file_cnt):
+                            # print(list_team2.get(0,END)[j])
+                            # print(lv2_next)
+                            r_add = db_ws.max_row + 1
+                            db_ws.cell(row=r_add, column=1).value = lv1_cnt + "-" + lv2_cnt + "-" + lv3_next
+                            print(db_ws.cell(row=r_add, column=1).value)
+                            if len(entry_task_name.get()) == 0:
+                                db_ws.cell(row=r_add, column=2).value = " "
+                            else :    
+                                db_ws.cell(row=r_add, column=2).value = entry_task_name.get()
+                            if len(entry_team_name.get()) == 0 :
+                                db_ws.cell(row=r_add, column=3).value = " "
+                            else :    
+                                db_ws.cell(row=r_add, column=3).value = entry_team_name.get()
+                            
+                            # if len(entry_person_name.get()) == 0:
+                            #     db_ws.cell(row=r_add, column=4).value = " "
+                            # else :    
+                            #     db_ws.cell(row=r_add, column=4).value = entry_person_name.get()
+                            
+                            db_ws.cell(row=r_add, column=4).value = list_person2.get(0,END)[j]                            
+
+                            db_ws.cell(row=r_add, column=5).value = cmb_situation.get()
+                            if len(entry_date.get()) == 0:
+                                db_ws.cell(row=r_add, column=6).value = " "    
+                            else :
+                                db_ws.cell(row=r_add, column=6).value = entry_date.get()
+                            if len(entry_time.get()) == 0:
+                                db_ws.cell(row=r_add, column=7).value = " "
+                            else :    
+                                db_ws.cell(row=r_add, column=7).value = entry_time.get()
+                            if len(entry_note.get()) == 0:
+                                db_ws.cell(row=r_add, column=8).value = " "
+                            else :     
+                                db_ws.cell(row=r_add, column=8).value = entry_note.get()
+                            db_ws.cell(row=r_add, column=9).value = 2
+
+                            wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+
+                            lv3_next = int(lv3_next)
+                            lv3_next = format(lv3_next+1,'02')
 
 
             msgbox.showinfo("알림", "하위 업무 추가가 완료되었습니다.")
@@ -451,12 +747,6 @@ def add_task2():
 
 
         def team_load():
-
-
-            # wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
-            # team_ws = wb['Team']
-            # div_team = team_ws['A']
-            # lst_team = team_ws['B']
             df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
                                     sheet_name = 'Team')
             # print(df_team)
@@ -476,9 +766,17 @@ def add_task2():
 
             for div in div_team["분류"]:
                 list_team.insert(END,div)
-                        
-        # def test(event):
-        #     print("dkdkdk")
+
+        def person_load():
+            df_person = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+                                    sheet_name = 'Person')
+
+            div_person = df_person['분류'].drop_duplicates()
+            div_person = div_person.reset_index()
+            div_person = div_person.drop('index',axis=1)
+
+            for div in div_person["분류"]:
+                list_person.insert(END,div)
 
         def get_team(self):
             # 아래 문구가 있어야 list_team의 값이 다른 곳에 클릭을 해도 값이 유지가 됨
@@ -491,8 +789,8 @@ def add_task2():
             div_team = df_team['분류'].drop_duplicates()
             div_team = div_team.reset_index()
             div_team = div_team.drop('index',axis=1)
-            for div in div_team["분류"]:
-                list_team.insert(END,div)
+            # for div in div_team["분류"]:
+            #     list_team.insert(END,div)
 
             # list_team2 reset
             list_team2.delete(0,END)
@@ -519,8 +817,25 @@ def add_task2():
             #     if df_team['분류'][row] == list_team.get():
             #         list_team2.insert(END,df_team['이름'][row])
 
+        def get_person(self):
+            # 아래 문구가 있어야 list_team의 값이 다른 곳에 클릭을 해도 값이 유지가 됨
+            list_person.get(list_person.curselection())
+            
+            df_person = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+                                    sheet_name = 'Person')
+            div_person = df_person['분류'].drop_duplicates()
+            div_person = div_person.reset_index()
+            div_person = div_person.drop('index',axis=1)
+            # for div in div_person["분류"]:
+            #     list_person.insert(END,div)
+
+            # list_team2 reset
+            list_person2.delete(0,END)
+
+            for row in range(len(df_person['분류'])):
+                if df_person['분류'][row] == div_person['분류'][list_person.curselection()[0]]:
+                    list_person2.insert(END,df_person['이름'][row])
         
-        # print(get_text)
 
         tree.bind('<ButtonRelease-1>', get_text)
         tree.bind('<ButtonRelease-1>', get_iid)
@@ -551,9 +866,9 @@ def add_task2():
 
         # master를 추가 안 하면 무조건 0 값만 나옴 
         rad_var = IntVar(master=add_tk)
-        rbt_one = Radiobutton(frame_radio, text="단일 팀/사람", value=1, variable=rad_var)
-        rbt_teams = Radiobutton(frame_radio, text="다수 팀", value=2, variable=rad_var)
-        rbt_people = Radiobutton(frame_radio, text="다수 담당자", value=3, variable=rad_var)
+        rbt_one = Radiobutton(frame_radio, text="1) 단일 팀/담당자  ", value=1, variable=rad_var)
+        rbt_teams = Radiobutton(frame_radio, text="2) 다수 팀  ", value=2, variable=rad_var)
+        rbt_people = Radiobutton(frame_radio, text="3) 다수 담당자", value=3, variable=rad_var)
 
         # 기본값 선택
         rbt_one.select()
@@ -568,7 +883,7 @@ def add_task2():
         frame_team_name = Frame(add_tk)
         frame_team_name.pack(fill="x")
 
-        lbl_team_name = Label(frame_team_name, text="담당팀(단수)")
+        lbl_team_name = Label(frame_team_name, text="1) 담당팀(단일)")
         lbl_team_name.pack(side="left")
 
         entry_team_name = Entry(frame_team_name)
@@ -579,8 +894,11 @@ def add_task2():
         # frame_team_name2.pack()
         frame_team_name2.pack(fill="x")
 
-        lbl_team_name2 = Label(frame_team_name2, text="담당팀(복수)")
+        lbl_team_name2 = Label(frame_team_name2, text="2) 담당팀(다수)")
         lbl_team_name2.pack(side="left")
+
+        btn_team_edit = Button(frame_team_name2, text='즐겨찾기 편집(팀)', command=fav_team_edit)
+        btn_team_edit.pack(side="right")
 
         # 담당팀(복수) - 리스트
         frame_team_name3 = Frame(add_tk)
@@ -645,25 +963,87 @@ def add_task2():
         team_load()
 
         # 담당팀 복수 버튼
-        frame_team_name4 = Frame(add_tk)
-        frame_team_name4.pack(fill="x")
-        frame_team_name4.pack(fill="x")
+        # frame_team_name4 = Frame(add_tk)
+        # frame_team_name4.pack(fill="x")
+        # frame_team_name4.pack(fill="x")
 
-        btn_team_load = Button(frame_team_name4, text='즐겨찾기 불러오기', command = team_load)
-        btn_team_load.pack(side="left")
+        # btn_team_load = Button(frame_team_name4, text='즐겨찾기 불러오기', command = team_load)
+        # btn_team_load.pack(side="left")
 
-        btn_team_edit = Button(frame_team_name4, text='즐겨찾기 편집')
-        btn_team_edit.pack(side="left")
 
         # 담당자
         frame_person_name = Frame(add_tk)
         frame_person_name.pack(fill="x")
 
-        lbl_person_name = Label(frame_person_name, text="담당자")
+        lbl_person_name = Label(frame_person_name, text="1) 담당자")
         lbl_person_name.pack(side="left")
 
         entry_person_name = Entry(frame_person_name)
         entry_person_name.pack(side="right")
+
+        # 담당자(다수)
+        frame_person_name2 = Frame(add_tk)
+        # frame_team_name2.pack()
+        frame_person_name2.pack(fill="x")
+
+        lbl_person_name2 = Label(frame_person_name2, text="3) 담당자(다수)")
+        lbl_person_name2.pack(side="left")
+
+        btn_person_edit = Button(frame_person_name2, text='즐겨찾기 편집(담당자)', command=fav_person_edit)
+        btn_person_edit.pack(side="right")
+
+        # 담당팀(복수) - 리스트
+        frame_person_name3 = Frame(add_tk)
+        frame_person_name3.pack(fill="both")
+        # frame_team_name3.pack(fill="x")
+
+        yscrollbar3 = Scrollbar(frame_person_name3)
+        yscrollbar3.pack(side="left", fill='y')
+
+        # xscrollbar x축의 절반만 나오게 하는 것 실패
+        xscrollbar3 = Scrollbar(frame_person_name3, orient=HORIZONTAL)
+        xscrollbar3.pack(side="bottom", fill='x')
+        
+        list_person = Listbox(frame_person_name3, selectmode="browse", height = 6,
+        yscrollcommand=yscrollbar3.set, xscrollcommand=xscrollbar3.set)
+
+        list_person.bind('<<ListboxSelect>>',get_person)        
+
+        # list_team.pack(side="left", expand=1)
+        # list_team.place(x=0, y=200)
+        # list_team.pack(side="left", fill="y")
+        list_person.pack(side="left", fill="both", expand=True)
+
+
+        yscrollbar3.config(command=list_person.yview)
+        xscrollbar3.config(command=list_person.xview)
+
+
+
+        # 담당팀(복수) - 리스트
+
+        yscrollbar4 = Scrollbar(frame_person_name3)
+        yscrollbar4.pack(side="right", fill='y')
+
+        xscrollbar4 = Scrollbar(frame_person_name3, orient=HORIZONTAL)
+        # xscrollbar2.pack(side="bottom")
+        xscrollbar4.pack(side="bottom", fill='x',expand=True)
+
+        list_person2 = Listbox(frame_person_name3, selectmode="extended", height = 6,
+        yscrollcommand=yscrollbar4.set, xscrollcommand=xscrollbar4.set)
+
+        # list_file = Listbox(list_frame, selectmode="extended", height = 10,
+        # yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, wrap=NONE)
+        # list_team2.pack(side="left", expand=1)
+        list_person2.pack(side="right", fill="both", expand=True)
+
+
+        yscrollbar4.config(command=list_person2.yview)
+        xscrollbar4.config(command=list_person2.xview)
+
+
+        person_load()
+
 
         # 상황
         frame_situation = Frame(add_tk)
