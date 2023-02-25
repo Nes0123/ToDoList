@@ -13,8 +13,11 @@ import time
 
 
 # 필요 : class 사용하기, file name(os.getcwd)
+# def sort(): 의 과제 넘버링 다시 해서 빈 번호 채우기.
 # 담당팀, 담당자 주소록 만들기, 편집, 삭제 기능
 # x스크롤바 추가
+# 즐겨찾기 편집(담당자)의 삭제? 이런 것이 문제있었던 것 같음
+# 하위업무의 담당자나 담당팀 추가 프레임이 직관적이지 않음 
 
 def font_define():
     func_font = font.Font(family='맑은 고딕', size=12)
@@ -197,17 +200,52 @@ def get_iid():
     # print(selected_item.get("text"))
     return selected_iid
 
-# def get_team2(event):
-#     print("get_team2")
-#     value = list_team.get(list_team.curselection())
-#     print(value)
-    # region_clicked = self.identify_region()
-    # region_clicked = self.identify_region(event.x, event.y)
-    # print(region_clicked)
 
-def fav_person_edit():
-    pass
+# def fav_person_edit():
+#     pass
+
+def team_sort():
+    df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx", sheet_name='Team')
+    # print(db_df)
+    df_team = df_team.sort_values(by=['분류No'])
     
+    div_team = df_team['분류'].drop_duplicates()
+    div_team_cnt = len(div_team)
+    team_div_list = df_team["분류"].tolist()
+    print(df_team.분류No.max())
+
+    div_team_no = 1
+
+    if df_team.분류No.max() != div_team_cnt:
+        print("다르다")
+
+        for i in range(len(df_team['분류'])):
+            if i != 0:
+                if df_team['분류'][i] != df_team['분류'][i-1]:
+                    div_team_no += 1    
+            # else :
+            df_team['분류No'][i] = div_team_no
+            print(df_team['분류No'][i])
+
+
+    # print(db_df)
+    df_team.to_excel("C:/Python/Code/ToDoList/test.xlsx",index=False, sheet_name="Team")
+    path1 = "C:/Python/Code/ToDoList/ToDoList_Form.xlsx"
+    path2 = "C:/Python/Code/ToDoList/test.xlsx"
+    
+    wb2 = load_workbook(filename=path2)
+    ws2 = wb2['Team']
+
+    wb1 = load_workbook(filename=path1)
+    wb1.remove(wb1['Team'])
+    ws1 = wb1.create_sheet()
+    ws1.title = 'Team'
+    # ws1 = wb1['DB']
+    for row in ws2:
+        for cell in row:
+            ws1[cell.coordinate].value = cell.value
+    wb1.save(path1)
+
 
 def fav_team_edit():
     fav_edit = Tk()
@@ -215,6 +253,10 @@ def fav_team_edit():
 
 
     def team_load():
+        # treeview reset
+        # 이게 없으면 업무 추가시 기존 데이터가 2번 돌면서 iid가 또 있다고 하면서 에러가 남
+        list_team.delete(0,END)
+        team_sort()
         df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
                                 sheet_name = 'Team')
         # print(df_team)
@@ -238,9 +280,10 @@ def fav_team_edit():
 
     def get_team(self):
     # def get_team():
+        # 다른 함수에서도 이 변수(team_div_value)값을 가져와야 해서 global로 형식?지정
+        global team_div_value
         # 아래 문구가 있어야 list_team의 값이 다른 곳에 클릭을 해도 값이 유지가 됨
-        global div_value
-        div_value = list_team.get(list_team.curselection())
+        team_div_value = list_team.get(list_team.curselection())
         # value = list_team.get(list_team.curselection())
         # print(value)
 
@@ -276,14 +319,17 @@ def fav_team_edit():
         # entry_team_name.insert(END, df_team['이름'][list_team2.curselection()[0]])
         # print(div_team['분류'][list_team.curselection()[0]])
         # return print(div_team['분류'][list_team.curselection()[0]])
-        # return div_value
+        # return team_div_value
 
 
     def get_team_name(self):
         # list_team2.get(list_team2.curselection())
         # print(get_team())
         # get_team(self)
-        # print(div_value)
+        # print(team_div_value)
+        global team_name_value
+        team_name_value = list_team2.get(list_team2.curselection())
+
         df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
                                 sheet_name = 'Team')
         div_team = df_team['분류'].drop_duplicates()
@@ -291,7 +337,7 @@ def fav_team_edit():
         div_team = div_team.drop('index',axis=1)
         
         # print(list_team2.curselection())
-        print(list_team2.curselection()[0])
+        # print(list_team2.curselection()[0])
         # print(list_team2.get(0,END)[list_team2.curselection()[0]])
         # print(div_team['분류'][list_team.curselection()[0]])
 
@@ -300,7 +346,7 @@ def fav_team_edit():
         for row in range(len(df_team['분류'])):
             # print(df_team['분류'][row])
             # print()
-            if df_team['분류'][row] == div_value:
+            if df_team['분류'][row] == team_div_value:
                 team_name.append(df_team['이름'][row])
                 # print(df_team['이름'][row])
                 # print(row)
@@ -312,12 +358,186 @@ def fav_team_edit():
         entry_team_name.delete(0,END)
         entry_team_name.insert(END,team_name[list_team2.curselection()[0]])
 
+
+    def fav_add():
+        
+        if len(entry_team_div.get()) == 0 :
+            msgbox.showerror("에러", "분류에 데이터를 입력해주세요.")
+            return
+        if len(entry_team_name.get()) == 0 :
+            msgbox.showerror("에러", "이름에 데이터를 입력해주세요.")
+            return
+
+        df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+                                sheet_name = 'Team')
+        div_team = df_team['분류'].drop_duplicates()
+        div_team = div_team.reset_index()
+        div_team = div_team.drop('index',axis=1)
+
+
+        print(len(div_team))
+        div_team_cnt = len(div_team)
+        wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+        team_ws = wb['Team']
+            
+        # Series type을 list 타입으로 변경
+        # list 타입을 해야 if in (존재)를 사용할 수 있음
+        team_div_list = df_team["분류"].tolist()
+        # print(entry_team_div.get())
+        # print(entry_team_name.get())
+        # print(type(df_team['분류']))
+        # print(type(team_div_list))        
+        exist = 0
+        for i in range(len(df_team['분류'])):
+            # if df_team['분류'][row] == entry_team_div.get() :
+            # print(i)
+            # print(df_team['분류'][i])
+            # 0부터 시작 + 1행 부터 시작 + 행 추가 : 합쳐서 3 더하기
+            r_add = i + 3
+
+            if entry_team_div.get() in team_div_list : 
+                if entry_team_div.get() == df_team['분류'][i] :
+                    div_team_no = df_team['분류No'][i]
+                    print(entry_team_div.get())
+                    print(div_team_no)
+                if entry_team_name.get() == df_team['이름'][i]:
+                    exist += 1
+                    
+                    # print(i," 분류 :", df_team['분류'][i])
+                    # print(i," 이름 :  ",df_team['이름'][i])
+                    # print("Yes :",df_team['이름'][i])
+            else : 
+                div_team_no = div_team_cnt + 1
+                print(entry_team_div.get())
+                print(div_team_no)   
+
+        if exist == 0 :    
+            team_ws.cell(row=r_add, column=1).value = entry_team_div.get()
+            team_ws.cell(row=r_add, column=2).value = entry_team_name.get()            
+            team_ws.cell(row=r_add, column=3).value = div_team_no
+            msgbox.showinfo("알림", "신규 데이터가 등록되었습니다.")       
+        else:
+            msgbox.showerror("중복","동일한 값이 존재합니다.")
+
+        wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+
+        team_load()
+        
+
+                
+            
+    def fav_modi():
+        try:
+            df_team = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+                                    sheet_name = 'Team')
+            wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+            team_ws = wb['Team']
+                
+            # Series type을 list 타입으로 변경
+            # list 타입을 해야 if in (존재)를 사용할 수 있음
+            team_div_list = df_team["분류"].tolist()
+            
+            # print(team_div_value)
+            # print(team_name_value)
+            # print(team_ws.max_row)
+            # if len(team_div_value) == 0 :
+            #     msgbox.showerror("에러(수정)", "분류 값을 입력해주세요.")
+
+            for r in range(2,team_ws.max_row+1) :
+                if team_ws.cell(row=r,column=1).value == team_div_value:
+                    if team_ws.cell(row=r,column=2).value == team_name_value:
+                        team_ws.cell(row=r,column=1).value = entry_team_div.get()
+                        team_ws.cell(row=r,column=2).value = entry_team_name.get()
+                        # print(r, "  분류: ", entry_team_div.get())
+                        # print(r, "  이름: ", entry_team_name.get())
+            
+            wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+
+            team_load()
+
+            msgbox.showinfo("안내", "수정이 완료 되었습니다.")
+
+        except NameError as err :
+            # print("dsdfasdf")
+
+            err_msg = str(err)
+            # if "name 'team_div_value' is not defined" in err.args:
+            #     print("div err")
+            # logger.error(err)
+            # if err_msg == "name 'team_div_value' is not defined":
+            #     print("div err2")
+            if 'team_name_value' in err_msg:
+                for r in range(2,team_ws.max_row+1) :
+                    print(team_ws.cell(row=r,column=1).value)
+                    if team_ws.cell(row=r,column=1).value == team_div_value:
+                        team_ws.cell(row=r,column=1).value = entry_team_div.get()
+
+                wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+        
+                team_load()
+
+                msgbox.showinfo("안내", "수정이 완료 되었습니다.")
+
+
+            else :
+                # print("div err3")
+                msgbox.showerror("에러", err)
+            
+
+    def fav_del():
+        try:
+            # print(get_iid())
+            wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+            team_ws = wb['Team']
+
+            for r in reversed(range(2,team_ws.max_row+1)):
+                # print(team_ws.cell(row=r, column=1).value)
+                print(team_ws.cell(row=r, column=2).value)
+                if team_ws.cell(row=r,column=1).value == team_div_value:
+                    if team_ws.cell(row=r,column=2).value == team_name_value:
+                        team_ws.delete_rows(r)
+                        print("둘다 값있고 삭제")
+            
+            wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+        
+            team_load()
+
+            msgbox.showinfo("안내", "삭제가 완료 되었습니다.")
+
+                
+        except NameError as err :
+            err_msg = str(err)
+            # if "name 'team_div_value' is not defined" in err.args:
+            #     print("div err")
+            # logger.error(err)
+            # if err_msg == "name 'team_div_value' is not defined":
+            #     print("div err2")
+            if 'team_name_value' in err_msg:
+                for r in reversed(range(2,team_ws.max_row+1)) :
+                    print(team_ws.cell(row=r,column=1).value)
+                    if team_ws.cell(row=r,column=1).value == team_div_value:
+                        team_ws.delete_rows(r)
+                        print("분류만 삭제")
+
+                wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+        
+                team_load()
+
+                msgbox.showinfo("안내", "삭제가 완료 되었습니다.")
+
+
+            else :
+                # print("div err3")
+                msgbox.showerror("에러", err)
+
+
+
     # 분류 프레임
     frame_team_div = Frame(fav_edit)
     frame_team_div.pack(fill="x")
 
     lbl_team_div = Label(frame_team_div, text="분류")
-    lbl_team_div.pack(side="left")
+    lbl_team_div.pack(side="left", pady=3)
 
     entry_team_div = Entry(frame_team_div)
     entry_team_div.pack(side="right")
@@ -327,7 +547,7 @@ def fav_team_edit():
     frame_team_name.pack(fill="x")
 
     lbl_team_name = Label(frame_team_name, text="이름")
-    lbl_team_name.pack(side="left")
+    lbl_team_name.pack(side="left", pady=3)
 
     entry_team_name = Entry(frame_team_name)
     entry_team_name.pack(side="right")
@@ -337,7 +557,7 @@ def fav_team_edit():
     # 담당팀(복수)
     frame_team_name2 = Frame(fav_edit)
     # frame_team_name2.pack()
-    frame_team_name2.pack(fill="x")
+    frame_team_name2.pack(fill="x", pady=3)
 
     lbl_team_name2 = Label(frame_team_name2, text="2) 담당팀(다수)")
     lbl_team_name2.pack(side="left")
@@ -406,8 +626,466 @@ def fav_team_edit():
 
     team_load()
 
+    # fucntion frame
+    frame_func = Frame(fav_edit)
+    frame_func.pack(fill="x", pady=3)
+
+    btn_fav_add = Button(frame_func, text="추가", command=fav_add)
+    btn_fav_add.pack(side="left", pady=3, padx=3)
+    
+    btn_fav_modi = Button(frame_func, text="수정", command=fav_modi)
+    btn_fav_modi.pack(side="left", pady=3, padx=3)
+    
+    btn_fav_del = Button(frame_func, text="삭제", command=fav_del)
+    btn_fav_del.pack(side="left", pady=3, padx=3)
+
 
     fav_edit.mainloop()
+
+# 즐겨찾기 담당자 정렬
+
+def person_sort():
+    df_person = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx", sheet_name='Person')
+    # print(db_df)
+    df_person = df_person.sort_values(by=['분류No'])
+    
+    div_team = df_person['분류'].drop_duplicates()
+    div_team_cnt = len(div_team)
+    person_div_list = df_person["분류"].tolist()
+    print(df_person.분류No.max())
+
+    div_team_no = 1
+
+    if df_person.분류No.max() != div_team_cnt:
+        print("다르다")
+
+        for i in range(len(df_person['분류'])):
+            if i != 0:
+                if df_person['분류'][i] != df_person['분류'][i-1]:
+                    div_team_no += 1    
+            # else :
+            df_person['분류No'][i] = div_team_no
+            print(df_person['분류No'][i])
+
+
+    # print(db_df)
+    df_person.to_excel("C:/Python/Code/ToDoList/test.xlsx",index=False, sheet_name="Person")
+    path1 = "C:/Python/Code/ToDoList/ToDoList_Form.xlsx"
+    path2 = "C:/Python/Code/ToDoList/test.xlsx"
+    
+    wb2 = load_workbook(filename=path2)
+    ws2 = wb2['Person']
+
+    wb1 = load_workbook(filename=path1)
+    wb1.remove(wb1['Person'])
+    ws1 = wb1.create_sheet()
+    ws1.title = 'Person'
+    # ws1 = wb1['DB']
+    for row in ws2:
+        for cell in row:
+            ws1[cell.coordinate].value = cell.value
+    wb1.save(path1)
+
+
+
+
+# 즐겨찾기 담당자 편집
+
+def fav_person_edit():
+    fav_person_edit = Tk()
+    fav_person_edit.title("담당자 - 즐겨찾기 수정")
+
+
+    def person_load():
+        # treeview reset
+        # 이게 없으면 업무 추가시 기존 데이터가 2번 돌면서 iid가 또 있다고 하면서 에러가 남
+        list_person.delete(0,END)
+        person_sort()
+        df_person = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+                                sheet_name = 'Person')
+        # print(df_person)
+        # print(df_person[df_person.분류 == '전실'])
+        # print(df_person['분류'][0])
+        
+        # print(df_person['분류'])
+        div_person = df_person['분류'].drop_duplicates()
+        # div_person = list(div_person)
+        # div_person = df_person['분류'].drop_duplicates(ignore_index=True)
+        div_person = div_person.reset_index()
+        div_person = div_person.drop('index',axis=1)
+        # print(div_person)
+        # print(len(div_person))
+        # print(div_person['분류'][1])
+        # div_person = df_person[]
+
+        for div in div_person["분류"]:
+            list_person.insert(END,div)
+
+
+    def get_person(self):
+    # def get_person():
+        # 다른 함수에서도 이 변수(person_div_value)값을 가져와야 해서 global로 형식?지정
+        global person_div_value
+        # 아래 문구가 있어야 list_person의 값이 다른 곳에 클릭을 해도 값이 유지가 됨
+        person_div_value = list_person.get(list_person.curselection())
+        # value = list_person.get(list_person.curselection())
+        # print(value)
+
+        df_person = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+                                sheet_name = 'Person')
+        div_person = df_person['분류'].drop_duplicates()
+        div_person = div_person.reset_index()
+        div_person = div_person.drop('index',axis=1)
+        # for div in div_person["분류"]:
+        #     list_person.insert(END,div)
+
+        # list_person2 reset
+        list_person2.delete(0,END)
+        # print(add_tk.focus())
+        # print("yes")
+        # df_person = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+        #                     sheet_name = 'person')
+        # print(list_person.curselection()[0])
+        # print(list_person.get(list_person.curselection(),list_person.curselection()))
+        # print(div_person['분류'][list_person.curselection()[0]])
+        for row in range(len(df_person['분류'])):
+            if df_person['분류'][row] == div_person['분류'][list_person.curselection()[0]]:
+                list_person2.insert(END,df_person['이름'][row])
+                # print(df_person['이름'][row])
+
+        
+        entry_person_div.delete(0,END)
+        entry_person_div.insert(END, div_person['분류'][list_person.curselection()[0]])
+
+        # print(list_person2.get(0,END)[list_person2.curselection()[0]])
+        # print(list_person2.curselection()[0])
+        # entry_person_name.delete(0,END)
+        # entry_person_name.insert(END, df_person['이름'][list_person2.curselection()[0]])
+        # print(div_person['분류'][list_person.curselection()[0]])
+        # return print(div_person['분류'][list_person.curselection()[0]])
+        # return person_div_value
+
+
+    def get_person_name(self):
+        # list_person2.get(list_person2.curselection())
+        # print(get_person())
+        # get_person(self)
+        # print(person_div_value)
+        global person_name_value
+        person_name_value = list_person2.get(list_person2.curselection())
+
+        df_person = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+                                sheet_name = 'Person')
+        div_person = df_person['분류'].drop_duplicates()
+        div_person = div_person.reset_index()
+        div_person = div_person.drop('index',axis=1)
+        
+        # print(list_person2.curselection())
+        # print(list_person2.curselection()[0])
+        # print(list_person2.get(0,END)[list_person2.curselection()[0]])
+        # print(div_person['분류'][list_person.curselection()[0]])
+
+        # print(df_person['이름'][list_person2.curselection()[0]])
+        person_name = []
+        for row in range(len(df_person['분류'])):
+            # print(df_person['분류'][row])
+            # print()
+            if df_person['분류'][row] == person_div_value:
+                person_name.append(df_person['이름'][row])
+                # print(df_person['이름'][row])
+                # print(row)
+                # print(df_person['분류'][row])
+
+                # for row2 in range(len(df_person['이름'])):
+                #     list_person2.insert(END,df_person['이름'][row])
+        # print(person_name[list_person2.curselection()[0]])
+        entry_person_name.delete(0,END)
+        entry_person_name.insert(END,person_name[list_person2.curselection()[0]])
+
+
+    def fav_add():
+        
+        if len(entry_person_div.get()) == 0 :
+            msgbox.showerror("에러", "분류에 데이터를 입력해주세요.")
+            return
+        if len(entry_person_name.get()) == 0 :
+            msgbox.showerror("에러", "이름에 데이터를 입력해주세요.")
+            return
+
+        df_person = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+                                sheet_name = 'Person')
+        div_person = df_person['분류'].drop_duplicates()
+        div_person = div_person.reset_index()
+        div_person = div_person.drop('index',axis=1)
+
+
+        print(len(div_person))
+        div_person_cnt = len(div_person)
+        wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+        person_ws = wb['Person']
+            
+        # Series type을 list 타입으로 변경
+        # list 타입을 해야 if in (존재)를 사용할 수 있음
+        person_div_list = df_person["분류"].tolist()
+        # print(entry_person_div.get())
+        # print(entry_person_name.get())
+        # print(type(df_person['분류']))
+        # print(type(person_div_list))        
+        exist = 0
+        for i in range(len(df_person['분류'])):
+            # if df_person['분류'][row] == entry_person_div.get() :
+            # print(i)
+            # print(df_person['분류'][i])
+            # 0부터 시작 + 1행 부터 시작 + 행 추가 : 합쳐서 3 더하기
+            r_add = i + 3
+
+            if entry_person_div.get() in person_div_list : 
+                if entry_person_div.get() == df_person['분류'][i] :
+                    div_person_no = df_person['분류No'][i]
+                    print(entry_person_div.get())
+                    print(div_person_no)
+                if entry_person_name.get() == df_person['이름'][i]:
+                    exist += 1
+                    
+                    # print(i," 분류 :", df_person['분류'][i])
+                    # print(i," 이름 :  ",df_person['이름'][i])
+                    # print("Yes :",df_person['이름'][i])
+            else : 
+                div_person_no = div_person_cnt + 1
+                print(entry_person_div.get())
+                print(div_person_no)   
+
+        if exist == 0 :    
+            person_ws.cell(row=r_add, column=1).value = entry_person_div.get()
+            person_ws.cell(row=r_add, column=2).value = entry_person_name.get()            
+            person_ws.cell(row=r_add, column=3).value = div_person_no
+            msgbox.showinfo("알림", "신규 데이터가 등록되었습니다.")       
+        else:
+            msgbox.showerror("중복","동일한 값이 존재합니다.")
+
+        wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+
+        person_load()
+        
+
+                
+            
+    def fav_modi():
+        try:
+            df_person = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx",
+                                    sheet_name = 'Person')
+            wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+            person_ws = wb['Person']
+                
+            # Series type을 list 타입으로 변경
+            # list 타입을 해야 if in (존재)를 사용할 수 있음
+            person_div_list = df_person["분류"].tolist()
+            
+            # print(person_div_value)
+            # print(person_name_value)
+            # print(person_ws.max_row)
+            # if len(person_div_value) == 0 :
+            #     msgbox.showerror("에러(수정)", "분류 값을 입력해주세요.")
+
+            for r in range(2,person_ws.max_row+1) :
+                if person_ws.cell(row=r,column=1).value == person_div_value:
+                    if person_ws.cell(row=r,column=2).value == person_name_value:
+                        person_ws.cell(row=r,column=1).value = entry_person_div.get()
+                        person_ws.cell(row=r,column=2).value = entry_person_name.get()
+                        # print(r, "  분류: ", entry_person_div.get())
+                        # print(r, "  이름: ", entry_person_name.get())
+            
+            wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+
+            person_load()
+
+            msgbox.showinfo("안내", "수정이 완료 되었습니다.")
+
+        except NameError as err :
+            # print("dsdfasdf")
+
+            err_msg = str(err)
+            # if "name 'person_div_value' is not defined" in err.args:
+            #     print("div err")
+            # logger.error(err)
+            # if err_msg == "name 'person_div_value' is not defined":
+            #     print("div err2")
+            if 'person_name_value' in err_msg:
+                for r in range(2,person_ws.max_row+1) :
+                    print(person_ws.cell(row=r,column=1).value)
+                    if person_ws.cell(row=r,column=1).value == person_div_value:
+                        person_ws.cell(row=r,column=1).value = entry_person_div.get()
+
+                wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+        
+                person_load()
+
+                msgbox.showinfo("안내", "수정이 완료 되었습니다.")
+
+
+            else :
+                # print("div err3")
+                msgbox.showerror("에러", err)
+            
+
+    def fav_del():
+        try:
+            # print(get_iid())
+            wb = load_workbook("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+            person_ws = wb['Person']
+
+            for r in reversed(range(2,person_ws.max_row+1)):
+                # print(person_ws.cell(row=r, column=1).value)
+                print(person_ws.cell(row=r, column=2).value)
+                if person_ws.cell(row=r,column=1).value == person_div_value:
+                    if person_ws.cell(row=r,column=2).value == person_name_value:
+                        person_ws.delete_rows(r)
+                        print("둘다 값있고 삭제")
+            
+            wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+        
+            person_load()
+
+            msgbox.showinfo("안내", "삭제가 완료 되었습니다.")
+
+                
+        except NameError as err :
+            err_msg = str(err)
+            # if "name 'person_div_value' is not defined" in err.args:
+            #     print("div err")
+            # logger.error(err)
+            # if err_msg == "name 'person_div_value' is not defined":
+            #     print("div err2")
+            if 'person_name_value' in err_msg:
+                for r in reversed(range(2,person_ws.max_row+1)) :
+                    print(person_ws.cell(row=r,column=1).value)
+                    if person_ws.cell(row=r,column=1).value == person_div_value:
+                        person_ws.delete_rows(r)
+                        print("분류만 삭제")
+
+                wb.save("C:/Python/Code/ToDoList/ToDoList_Form.xlsx")
+        
+                person_load()
+
+                msgbox.showinfo("안내", "삭제가 완료 되었습니다.")
+
+
+            else :
+                # print("div err3")
+                msgbox.showerror("에러", err)
+
+
+
+    # 분류 프레임
+    frame_person_div = Frame(fav_person_edit)
+    frame_person_div.pack(fill="x")
+
+    lbl_person_div = Label(frame_person_div, text="분류")
+    lbl_person_div.pack(side="left", pady=3)
+
+    entry_person_div = Entry(frame_person_div)
+    entry_person_div.pack(side="right")
+
+    # 팀 이름 프레임
+    frame_person_name = Frame(fav_person_edit)
+    frame_person_name.pack(fill="x")
+
+    lbl_person_name = Label(frame_person_name, text="이름")
+    lbl_person_name.pack(side="left", pady=3)
+
+    entry_person_name = Entry(frame_person_name)
+    entry_person_name.pack(side="right")
+
+
+
+    # 담당팀(복수)
+    frame_person_name2 = Frame(fav_person_edit)
+    # frame_person_name2.pack()
+    frame_person_name2.pack(fill="x", pady=3)
+
+    lbl_person_name2 = Label(frame_person_name2, text="2) 담당팀(다수)")
+    lbl_person_name2.pack(side="left")
+
+
+    # 담당팀(복수) - 리스트
+    frame_person_name3 = Frame(fav_person_edit)
+    # frame_person_name3.pack()
+    # frame_person_name3.pack(side="left")
+    frame_person_name3.pack(fill="both")
+    # frame_person_name3.pack(fill="x")
+
+    yscrollbar = Scrollbar(frame_person_name3)
+    yscrollbar.pack(side="left", fill='y')
+
+    # xscrollbar x축의 절반만 나오게 하는 것 실패
+    xscrollbar = Scrollbar(frame_person_name3, orient=HORIZONTAL)
+    # xscrollbar.pack(side="bottom")
+    # xscrollbar.pack(side="bottom",expand=True)
+    # xscrollbar.pack(side="bottom", fill='x',expand=True)
+    xscrollbar.pack(side="bottom", fill='x')
+    
+    # xscrollbar.place(relwidth=0.5)
+
+    list_person = Listbox(frame_person_name3, selectmode="browse", height = 6,
+    yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set)
+
+    list_person.bind('<<ListboxSelect>>',get_person)        
+
+    # list_person.pack(side="left", expand=1)
+    # list_person.place(x=0, y=200)
+    # list_person.pack(side="left", fill="y")
+    list_person.pack(side="left", fill="both", expand=True)
+
+
+    yscrollbar.config(command=list_person.yview)
+    xscrollbar.config(command=list_person.xview)
+
+    # get_person()
+
+    # 담당팀(복수) - 리스트
+    # frame_person_name5 = Frame(add_tk)
+    # frame_person_name5.pack()
+    # frame_person_name5.pack(side="right")
+
+    yscrollbar2 = Scrollbar(frame_person_name3)
+    yscrollbar2.pack(side="right", fill='y')
+
+    xscrollbar2 = Scrollbar(frame_person_name3, orient=HORIZONTAL)
+    # xscrollbar2.pack(side="bottom")
+    xscrollbar2.pack(side="bottom", fill='x',expand=True)
+
+    list_person2 = Listbox(frame_person_name3, selectmode="extended", height = 6,
+    yscrollcommand=yscrollbar2.set, xscrollcommand=xscrollbar2.set)
+
+    # list_file = Listbox(list_frame, selectmode="extended", height = 10,
+    # yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, wrap=NONE)
+    # list_person2.pack(side="left", expand=1)
+    list_person2.pack(side="right", fill="both", expand=True)
+
+
+    yscrollbar2.config(command=list_person2.yview)
+    xscrollbar2.config(command=list_person2.xview)
+
+    list_person2.bind('<<ListboxSelect>>',get_person_name)        
+
+    person_load()
+
+    # fucntion frame
+    frame_func = Frame(fav_person_edit)
+    frame_func.pack(fill="x", pady=3)
+
+    btn_fav_add = Button(frame_func, text="추가", command=fav_add)
+    btn_fav_add.pack(side="left", pady=3, padx=3)
+    
+    btn_fav_modi = Button(frame_func, text="수정", command=fav_modi)
+    btn_fav_modi.pack(side="left", pady=3, padx=3)
+    
+    btn_fav_del = Button(frame_func, text="삭제", command=fav_del)
+    btn_fav_del.pack(side="left", pady=3, padx=3)
+
+
+    fav_person_edit.mainloop()
+
 
 
 def add_task2():
@@ -1379,12 +2057,42 @@ def load_task():
         msgbox.showerror("에러", err)
 
 
+
 def sort():
-    db_df = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx", sheet_name='DB')
+    df_db = pd.read_excel("C:/Python/Code/ToDoList/ToDoList_Form.xlsx", sheet_name='DB')
     # print(db_df)
-    db_df = db_df.sort_values(by=['No'])
+    df_db = df_db.sort_values(by=['No'])
+
+    # 넘버링 새롭게 하기
+    # 레벨2, 3는 아직 못함. 레벨1만 넘버링함
+    lv1_cnt = 0
+    for i in range(len(df_db['업무레벨'])):
+        # print(df_db['업무레벨'][i])
+        if df_db['업무레벨'][i] == 1 :
+            lv1_cnt += 1
+    # print(lv1_cnt)
+    # print(int(df_db['No'][len(df_db['No'])-1][0:2]))
+    # print(type(lv1_cnt))
+    # if lv1_cnt == 7:
+    #     print("123")
+    # if int(df_db['No'][len(df_db['No'])-1][0:2]) == 7:
+    #     print("445")
+    lv1_cnt = 0
+    if lv1_cnt != int(df_db['No'][len(df_db['No'])-1][0:2]) :
+        # print("different")
+        for i in range(len(df_db['업무레벨'])):
+        # print(df_db['업무레벨'][i])
+            if df_db['업무레벨'][i] == 1 :
+                lv1_cnt += 1
+            # print("asis : ", df_db['No'][i])
+            df_db['No'][i] = format(lv1_cnt,'02') + "-"+ df_db['No'][i][3:]
+            # print("tobe : ", df_db['No'][i])
+            
+            # df_db['No'][len(df_db['No'])-1][0:2] = format(lv1_cnt,'02')
+                
+    # print("lv1_cnt : ", lv1_cnt)
     # print(db_df)
-    db_df.to_excel("C:/Python/Code/ToDoList/test.xlsx",index=False, sheet_name="DB")
+    df_db.to_excel("C:/Python/Code/ToDoList/test.xlsx",index=False, sheet_name="DB")
     path1 = "C:/Python/Code/ToDoList/ToDoList_Form.xlsx"
     path2 = "C:/Python/Code/ToDoList/test.xlsx"
     
